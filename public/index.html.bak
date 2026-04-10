@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notas Escolares</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/table.css">
+  <link rel="stylesheet" href="/css/forms.css">
+  <style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loader { position:fixed;inset:0;background:var(--color-bg);display:flex;align-items:center;
+      justify-content:center;z-index:9999;flex-direction:column;gap:var(--space-4) }
+    #loader p { color:var(--color-text-muted);font-size:var(--text-sm) }
+    #loader svg { animation:spin 1s linear infinite;color:var(--color-primary) }
+  </style>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+
+<!-- Pantalla de carga inicial -->
+<div id="loader">
+  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+       fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+  </svg>
+  <p>Cargando…</p>
+</div>
+
+<!-- ===================== SIDEBAR ===================== -->
+<nav id="sidebar" style="display:none">
+  <div class="sidebar-logo">
+    <img src="/assets/logo.svg" width="28" height="28" alt="Logo" loading="lazy">
+    <span class="logo-text">Notas Escolares</span>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Principal</div>
+    <div class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')"><i data-lucide="layout-dashboard" size="16"></i> Resumen</div>
+    <div class="nav-item" data-page="notas" onclick="navigate('notas')"><i data-lucide="clipboard-list" size="16"></i> Notas</div>
+    <div class="nav-item" data-page="alumnos" onclick="navigate('alumnos')"><i data-lucide="users" size="16"></i> Alumnos</div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Configuración</div>
+    <div class="nav-item" data-page="asignaturas" onclick="navigate('asignaturas')"><i data-lucide="book-open" size="16"></i> Asignaturas</div>
+    <div class="nav-item" data-page="cursos" onclick="navigate('cursos')"><i data-lucide="building-2" size="16"></i> Cursos</div>
+    <div class="nav-item" data-page="profesores" onclick="navigate('profesores')"><i data-lucide="graduation-cap" size="16"></i> Profesores</div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="nav-item" onclick="toggleTheme()">
+      <i data-lucide="sun" size="16" id="theme-icon"></i>
+      <span id="theme-label">Modo claro</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ===================== MAIN ===================== -->
+<div id="main" style="display:none">
+  <header id="topbar">
+    <button class="icon-btn" style="display:none" id="menu-btn" onclick="toggleSidebar()" aria-label="Menú"><i data-lucide="menu" size="20"></i></button>
+    <div class="topbar-title" id="page-title">Resumen</div>
+    <button class="btn btn-primary" id="add-btn" onclick="openAddModal()"><i data-lucide="plus" size="14"></i> Agregar</button>
+  </header>
+
+  <main id="content">
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="kpi-grid" id="kpi-grid"></div>
+      <div class="two-col">
+        <div class="table-wrap">
+          <div class="table-header"><span style="font-weight:600;font-size:var(--text-sm)">Últimas notas registradas</span></div>
+          <table class="data-table"><thead><tr><th>Alumno</th><th>Asignatura</th><th>Nota</th><th>Fecha</th></tr></thead><tbody id="recent-notas-body"></tbody></table>
+        </div>
+        <div class="table-wrap">
+          <div class="table-header"><span style="font-weight:600;font-size:var(--text-sm)">Promedio por asignatura</span></div>
+          <table class="data-table"><thead><tr><th>Asignatura</th><th>Promedio</th><th>Distribución</th></tr></thead><tbody id="prom-asig-body"></tbody></table>
+        </div>
+      </div>
+    </div>
+    <!-- NOTAS -->
+    <div class="page" id="page-notas">
+      <div class="table-header" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg) var(--radius-lg) 0 0;border-bottom:none">
+        <div class="table-search"><i data-lucide="search" size="14" class="search-icon"></i><input type="text" placeholder="Buscar alumno o asignatura…" id="search-notas" oninput="renderNotas()"></div>
+        <div class="filter-bar">
+          <select class="select-input" id="filter-curso" onchange="renderNotas()"><option value="">Todos los cursos</option></select>
+          <select class="select-input" id="filter-asig"  onchange="renderNotas()"><option value="">Todas las asignaturas</option></select>
+        </div>
+      </div>
+      <div class="table-wrap" style="border-radius:0 0 var(--radius-lg) var(--radius-lg)">
+        <table class="data-table"><thead><tr><th>Alumno</th><th>Curso</th><th>Asignatura</th><th>Tipo</th><th>Nota</th><th>Fecha</th><th>Profesor</th><th>Acciones</th></tr></thead><tbody id="notas-body"></tbody></table>
+      </div>
+    </div>
+    <!-- ALUMNOS -->
+    <div class="page" id="page-alumnos">
+      <div class="table-header" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg) var(--radius-lg) 0 0;border-bottom:none">
+        <div class="table-search"><i data-lucide="search" size="14" class="search-icon"></i><input type="text" placeholder="Buscar alumno…" id="search-alumnos" oninput="renderAlumnos()"></div>
+        <select class="select-input" id="filter-curso-alumnos" onchange="renderAlumnos()"><option value="">Todos los cursos</option></select>
+      </div>
+      <div class="table-wrap" style="border-radius:0 0 var(--radius-lg) var(--radius-lg)">
+        <table class="data-table"><thead><tr><th>Alumno</th><th>RUT</th><th>Curso</th><th>Email</th><th>Estado</th><th>Promedio</th><th>Acciones</th></tr></thead><tbody id="alumnos-body"></tbody></table>
+      </div>
+    </div>
+    <!-- ASIGNATURAS -->
+    <div class="page" id="page-asignaturas">
+      <div class="table-wrap">
+        <div class="table-header"><div class="table-search"><i data-lucide="search" size="14" class="search-icon"></i><input type="text" placeholder="Buscar asignatura…" id="search-asig" oninput="renderAsignaturas()"></div></div>
+        <table class="data-table"><thead><tr><th>Nombre</th><th>Código</th><th>Horas sem.</th><th>Descripción</th><th>Acciones</th></tr></thead><tbody id="asig-body"></tbody></table>
+      </div>
+    </div>
+    <!-- CURSOS -->
+    <div class="page" id="page-cursos">
+      <div class="table-wrap">
+        <table class="data-table"><thead><tr><th>Nombre</th><th>Nivel</th><th>Jefe de Curso</th><th>Alumnos</th><th>Año</th><th>Acciones</th></tr></thead><tbody id="cursos-body"></tbody></table>
+      </div>
+    </div>
+    <!-- PROFESORES -->
+    <div class="page" id="page-profesores">
+      <div class="table-wrap">
+        <div class="table-header"><div class="table-search"><i data-lucide="search" size="14" class="search-icon"></i><input type="text" placeholder="Buscar profesor…" id="search-prof" oninput="renderProfesores()"></div></div>
+        <table class="data-table"><thead><tr><th>Nombre</th><th>RUT</th><th>Email</th><th>Especialidad</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="prof-body"></tbody></table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODALES (igual que la versión estática) -->
+<div class="overlay" id="modal-nota" style="display:none">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title" id="modal-nota-title">Nota</span><button class="icon-btn" onclick="closeModal('modal-nota')"><i data-lucide="x" size="18"></i></button></div>
+    <div class="modal-body">
+      <div class="form-row"><div class="form-group"><label class="form-label">Alumno *</label><select class="form-input" id="nota-alumno"></select></div><div class="form-group"><label class="form-label">Asignatura *</label><select class="form-input" id="nota-asig"></select></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Nota (1.0–7.0) *</label><input type="number" class="form-input" id="nota-valor" min="1" max="7" step="0.1"></div><div class="form-group"><label class="form-label">Tipo</label><select class="form-input" id="nota-tipo"><option>Prueba</option><option>Control</option><option>Tarea</option><option>Trabajo</option><option>Examen</option><option>Disertación</option></select></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Fecha</label><input type="date" class="form-input" id="nota-fecha"></div><div class="form-group"><label class="form-label">Observación</label><input type="text" class="form-input" id="nota-obs"></div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-nota')">Cancelar</button><button class="btn btn-primary" onclick="saveNota()">Guardar</button></div>
+  </div>
+</div>
+<div class="overlay" id="modal-alumno" style="display:none">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Alumno</span><button class="icon-btn" onclick="closeModal('modal-alumno')"><i data-lucide="x" size="18"></i></button></div>
+    <div class="modal-body">
+      <div class="form-row"><div class="form-group"><label class="form-label">Nombres *</label><input type="text" class="form-input" id="al-nombres"></div><div class="form-group"><label class="form-label">Apellidos *</label><input type="text" class="form-input" id="al-apellidos"></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">RUT</label><input type="text" class="form-input" id="al-rut" placeholder="12.345.678-9"></div><div class="form-group"><label class="form-label">Fecha nacimiento</label><input type="date" class="form-input" id="al-nac"></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Curso *</label><select class="form-input" id="al-curso"></select></div><div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="al-email"></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Tel. apoderado</label><input type="text" class="form-input" id="al-tel"></div><div class="form-group"><label class="form-label">Estado</label><select class="form-input" id="al-estado"><option>Activo</option><option>Inactivo</option><option>Retirado</option></select></div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-alumno')">Cancelar</button><button class="btn btn-primary" onclick="saveAlumno()">Guardar</button></div>
+  </div>
+</div>
+<div class="overlay" id="modal-asig" style="display:none">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Asignatura</span><button class="icon-btn" onclick="closeModal('modal-asig')"><i data-lucide="x" size="18"></i></button></div>
+    <div class="modal-body">
+      <div class="form-row"><div class="form-group"><label class="form-label">Nombre *</label><input type="text" class="form-input" id="as-nombre"></div><div class="form-group"><label class="form-label">Código</label><input type="text" class="form-input" id="as-codigo"></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Horas semanales</label><input type="number" class="form-input" id="as-horas" value="4"></div><div class="form-group"><label class="form-label">Descripción</label><input type="text" class="form-input" id="as-desc"></div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-asig')">Cancelar</button><button class="btn btn-primary" onclick="saveAsignatura()">Guardar</button></div>
+  </div>
+</div>
+<div class="overlay" id="modal-curso" style="display:none">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Curso</span><button class="icon-btn" onclick="closeModal('modal-curso')"><i data-lucide="x" size="18"></i></button></div>
+    <div class="modal-body">
+      <div class="form-row"><div class="form-group"><label class="form-label">Nombre *</label><input type="text" class="form-input" id="cu-nombre" placeholder="1°A Básico"></div><div class="form-group"><label class="form-label">Nivel</label><select class="form-input" id="cu-nivel"><option>Básico</option><option>Medio</option></select></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Año</label><input type="number" class="form-input" id="cu-anio" value="2025"></div><div class="form-group"><label class="form-label">Jefe de curso</label><select class="form-input" id="cu-jefe"></select></div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-curso')">Cancelar</button><button class="btn btn-primary" onclick="saveCurso()">Guardar</button></div>
+  </div>
+</div>
+<div class="overlay" id="modal-prof" style="display:none">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Profesor</span><button class="icon-btn" onclick="closeModal('modal-prof')"><i data-lucide="x" size="18"></i></button></div>
+    <div class="modal-body">
+      <div class="form-row"><div class="form-group"><label class="form-label">Nombres *</label><input type="text" class="form-input" id="pr-nombres"></div><div class="form-group"><label class="form-label">Apellidos *</label><input type="text" class="form-input" id="pr-apellidos"></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">RUT</label><input type="text" class="form-input" id="pr-rut"></div><div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="pr-email"></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Especialidad</label><input type="text" class="form-input" id="pr-esp"></div><div class="form-group"><label class="form-label">Estado</label><select class="form-input" id="pr-estado"><option>Activo</option><option>Inactivo</option></select></div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-prof')">Cancelar</button><button class="btn btn-primary" onclick="saveProfesor()">Guardar</button></div>
+  </div>
+</div>
+
+<!-- Scripts en orden correcto -->
+<script src="/js/api.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/views.js"></script>
+<script src="/js/modals.js"></script>
+<script>
+  // Ocultar loader cuando todo esté listo
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('sidebar').style.display = '';
+      document.getElementById('main').style.display = '';
+    }, 300);
+  });
+</script>
+</body>
+</html>

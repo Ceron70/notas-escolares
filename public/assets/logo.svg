@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" aria-label="Notas Escolares">
+  <rect width="32" height="32" rx="8" fill="#01696f" opacity="0.12"/>
+  <rect x="6" y="8"  width="14" height="2.5" rx="1.25" fill="#01696f"/>
+  <rect x="6" y="13" width="10" height="2.5" rx="1.25" fill="#01696f"/>
+  <rect x="6" y="18" width="12" height="2.5" rx="1.25" fill="#01696f"/>
+  <circle cx="24" cy="22" r="5" fill="#01696f"/>
+  <text x="24" y="25.5" text-anchor="middle" font-size="7" font-weight="700" fill="white" font-family="Inter,sans-serif">7</text>
+</svg>

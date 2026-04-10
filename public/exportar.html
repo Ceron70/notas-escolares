@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exportar Notas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap" rel="stylesheet">
+  <!-- ExcelJS para generar .xlsx en el navegador -->
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
+  <style>
+    :root {
+      --primary:#01696f; --primary-h:#0c4e54;
+      --text:#28251d; --muted:#7a7974; --faint:#bab9b4;
+      --border:#d4d1ca; --bg:#f7f6f2; --surface:#fff;
+      --success:#437a22; --error:#a12c7b;
+      --r:.5rem;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
+
+    .page{max-width:680px;margin:3rem auto;padding:0 1rem}
+
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+      padding:2rem;box-shadow:0 4px 12px rgba(0,0,0,.06);margin-bottom:1.5rem}
+
+    h1{font-size:1.4rem;font-weight:700;margin-bottom:.25rem}
+    .subtitle{color:var(--muted);font-size:.85rem;margin-bottom:1.75rem}
+
+    h2{font-size:.95rem;font-weight:600;margin-bottom:1rem;color:var(--text)}
+
+    label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:.3rem;margin-top:.75rem}
+    select,input{width:100%;padding:.45rem .75rem;border:1px solid var(--border);
+      border-radius:var(--r);font:inherit;color:var(--text);background:var(--bg)}
+    select:focus,input:focus{outline:2px solid var(--primary);outline-offset:2px}
+
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    @media(max-width:500px){.grid2{grid-template-columns:1fr}}
+
+    .export-options{display:flex;flex-direction:column;gap:.75rem;margin-top:.5rem}
+
+    .export-btn{
+      display:flex;align-items:center;gap:.85rem;
+      padding:.9rem 1.1rem;border-radius:var(--r);
+      border:1px solid var(--border);background:var(--bg);
+      cursor:pointer;text-align:left;transition:border-color .15s,background .15s;
+      width:100%;
+    }
+    .export-btn:hover{border-color:var(--primary);background:#f0f7f7}
+    .export-btn.loading{opacity:.6;pointer-events:none}
+
+    .btn-icon{
+      width:38px;height:38px;border-radius:.4rem;
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.2rem;flex-shrink:0;
+    }
+    .icon-csv {background:#d4dfcc;color:#2e5c10}
+    .icon-xlsx{background:#c6d8e4;color:#0b5177}
+
+    .btn-info{flex:1}
+    .btn-title{font-weight:600;font-size:.88rem;margin-bottom:.15rem}
+    .btn-desc{font-size:.75rem;color:var(--muted)}
+
+    .btn-arrow{color:var(--faint);font-size:1.1rem;margin-left:auto}
+
+    .back-link{display:inline-flex;align-items:center;gap:.4rem;
+      color:var(--muted);font-size:.82rem;text-decoration:none;margin-top:1rem}
+    .back-link:hover{color:var(--primary)}
+
+    .toast{position:fixed;bottom:1.5rem;right:1.5rem;
+      padding:.6rem 1.1rem;border-radius:var(--r);font-size:.82rem;font-weight:500;
+      background:var(--text);color:#fff;opacity:0;transition:opacity .2s;pointer-events:none;z-index:99}
+    .toast.show{opacity:1}
+    .toast.err{background:var(--error)}
+
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .spinner{display:inline-block;width:16px;height:16px;border:2px solid currentColor;
+      border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="card">
+    <h1>📤 Exportar Notas</h1>
+    <p class="subtitle">Descarga las notas en formato CSV (Excel) o XLSX con formato profesional.</p>
+
+    <!-- Filtros -->
+    <h2>Filtros opcionales</h2>
+    <div class="grid2">
+      <div>
+        <label>Curso</label>
+        <select id="f-curso"><option value="">Todos los cursos</option></select>
+      </div>
+      <div>
+        <label>Asignatura</label>
+        <select id="f-asig"><option value="">Todas las asignaturas</option></select>
+      </div>
+    </div>
+
+    <!-- Opciones de exportación -->
+    <h2 style="margin-top:1.5rem">Formato de exportación</h2>
+    <div class="export-options">
+
+      <button class="export-btn" onclick="exportarCSV('notas')">
+        <div class="btn-icon icon-csv">📄</div>
+        <div class="btn-info">
+          <div class="btn-title">Notas individuales — CSV</div>
+          <div class="btn-desc">Todas las evaluaciones con alumno, asignatura, nota, fecha y profesor</div>
+        </div>
+        <span class="btn-arrow">›</span>
+      </button>
+
+      <button class="export-btn" onclick="exportarCSV('promedios')">
+        <div class="btn-icon icon-csv">📊</div>
+        <div class="btn-info">
+          <div class="btn-title">Promedios por asignatura — CSV</div>
+          <div class="btn-desc">Promedio de cada alumno por asignatura con estado (aprobado/reprobado)</div>
+        </div>
+        <span class="btn-arrow">›</span>
+      </button>
+
+      <button class="export-btn" onclick="exportarXLSX()">
+        <div class="btn-icon icon-xlsx">🗂️</div>
+        <div class="btn-info">
+          <div class="btn-title">Libro completo — Excel (.xlsx)</div>
+          <div class="btn-desc">Notas + Promedios en hojas separadas con formato, colores y encabezados</div>
+        </div>
+        <span class="btn-arrow">›</span>
+      </button>
+
+    </div>
+  </div>
+
+  <a href="/" class="back-link">← Volver al sistema</a>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let cursosData = [], asigsData = [];
+
+  (async () => {
+    [cursosData, asigsData] = await Promise.all([
+      fetch('/api/cursos').then(r=>r.json()),
+      fetch('/api/asignaturas').then(r=>r.json())
+    ]);
+    document.getElementById('f-curso').innerHTML =
+      '<option value="">Todos los cursos</option>' +
+      cursosData.map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('');
+    document.getElementById('f-asig').innerHTML =
+      '<option value="">Todas las asignaturas</option>' +
+      asigsData.map(a=>`<option value="${a.id}">${a.nombre}</option>`).join('');
+  })();
+
+  function getParams() {
+    const p = new URLSearchParams();
+    const c = document.getElementById('f-curso').value;
+    const a = document.getElementById('f-asig').value;
+    if (c) p.append('curso_id', c);
+    if (a) p.append('asig_id', a);
+    return p.toString() ? '?' + p.toString() : '';
+  }
+
+  function toast(msg, err=false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (err?' err':'');
+    setTimeout(()=>t.className='toast', 2800);
+  }
+
+  function setLoading(btn, on) {
+    btn.classList.toggle('loading', on);
+    const arrow = btn.querySelector('.btn-arrow');
+    if (on) arrow.innerHTML = '<span class="spinner"></span>';
+    else    arrow.innerHTML = '›';
+  }
+
+  // ── CSV simple: delegar al backend ────────────────────────────────────────
+  function exportarCSV(tipo) {
+    const url = `/api/exportar/${tipo}.csv${getParams()}`;
+    const a = document.createElement('a');
+    a.href = url; a.download = `${tipo}.csv`; a.click();
+    toast(`✓ Descargando ${tipo}.csv`);
+  }
+
+  // ── Excel con ExcelJS ─────────────────────────────────────────────────────
+  async function exportarXLSX() {
+    const btn = document.querySelector('.export-btn:last-child');
+    setLoading(btn, true);
+    try {
+      const params = getParams();
+      const [notas, promedios] = await Promise.all([
+        fetch(`/api/exportar/notas.csv${params}`).then(r=>r.text()),
+        fetch(`/api/exportar/promedios.csv${params}`).then(r=>r.text())
+      ]);
+
+      const wb = new ExcelJS.Workbook();
+      wb.creator = 'Notas Escolares';
+      wb.created = new Date();
+
+      // ── Colores ──
+      const C_HDR_FILL = { type:'pattern', pattern:'solid', fgColor:{argb:'FF01696F'} };
+      const C_HDR_FONT = { name:'Calibri', size:11, bold:true, color:{argb:'FFFFFFFF'} };
+      const C_BODY_FONT= { name:'Calibri', size:11 };
+      const C_EVEN_FILL= { type:'pattern', pattern:'solid', fgColor:{argb:'FFF0F7F7'} };
+
+      function colorNota(v) {
+        if (v >= 6.5) return 'FF437A22';
+        if (v >= 5.0) return 'FF006494';
+        if (v >= 4.0) return 'FFD19900';
+        return 'FFA12C7B';
+      }
+
+      function parseCSV(text) {
+        const lines = text.replace(/^\uFEFF/,'').split('\r\n').filter(Boolean);
+        return lines.map(l => {
+          const cols = []; let cur='', inQ=false;
+          for (const ch of l) {
+            if (ch==='"') inQ=!inQ;
+            else if (ch===',' && !inQ) { cols.push(cur); cur=''; }
+            else cur+=ch;
+          }
+          cols.push(cur);
+          return cols;
+        });
+      }
+
+      function buildSheet(wb, name, rows, notaCol) {
+        const ws = wb.addWorksheet(name, { views:[{state:'frozen',ySplit:1}] });
+        if (!rows.length) return;
+
+        const headers = rows[0];
+        const colCount = headers.length;
+
+        // Anchos por columna
+        const widths = [30, 16, 18, 18, 12, 8, 12, 22, 30];
+        headers.forEach((h, i) => {
+          ws.getColumn(i+1).width = widths[i] || 15;
+        });
+
+        // Fila encabezado
+        const hdrRow = ws.addRow(headers);
+        hdrRow.eachCell(cell => {
+          cell.fill = C_HDR_FILL;
+          cell.font = C_HDR_FONT;
+          cell.alignment = { vertical:'middle', horizontal:'center' };
+          cell.border = { bottom:{style:'thin',color:{argb:'FF01696F'}} };
+        });
+        hdrRow.height = 22;
+
+        // Filas de datos
+        for (let i=1; i<rows.length; i++) {
+          const r = rows[i];
+          const dataRow = ws.addRow(r);
+          dataRow.height = 18;
+          const isEven = i%2===0;
+          dataRow.eachCell((cell, colN) => {
+            cell.font = C_BODY_FONT;
+            cell.alignment = { vertical:'middle', horizontal: colN===1 ? 'left' : 'center' };
+            if (isEven) cell.fill = C_EVEN_FILL;
+          });
+          // Colorear celda de nota
+          if (notaCol !== null) {
+            const v = parseFloat(r[notaCol]);
+            if (!isNaN(v)) {
+              const noteCell = dataRow.getCell(notaCol+1);
+              noteCell.font = { name:'Calibri', size:11, bold:true, color:{argb:colorNota(v)} };
+            }
+          }
+        }
+
+        // Auto-filtro
+        ws.autoFilter = { from:{row:1,column:1}, to:{row:1,column:colCount} };
+      }
+
+      const notasRows    = parseCSV(notas);
+      const promediosRows= parseCSV(promedios);
+
+      buildSheet(wb, 'Notas',     notasRows,     5);  // col 5 = Nota
+      buildSheet(wb, 'Promedios', promediosRows, 4);  // col 4 = Promedio
+
+      // Hoja resumen
+      const ws3 = wb.addWorksheet('Resumen');
+      ws3.getColumn(1).width = 30;
+      ws3.getColumn(2).width = 15;
+
+      const titulo = ws3.addRow(['Notas Escolares — Resumen de exportación']);
+      titulo.getCell(1).font = { name:'Calibri', size:14, bold:true, color:{argb:'FF01696F'} };
+      titulo.height = 28;
+      ws3.addRow([]);
+      ws3.addRow(['Fecha de exportación', new Date().toLocaleDateString('es-CL')]);
+      ws3.addRow(['Total evaluaciones', notasRows.length > 1 ? notasRows.length-1 : 0]);
+      ws3.addRow(['Total filas promedios', promediosRows.length > 1 ? promediosRows.length-1 : 0]);
+      const filtro = [];
+      const cSel = document.getElementById('f-curso');
+      const aSel = document.getElementById('f-asig');
+      if (cSel.value) filtro.push('Curso: ' + cSel.options[cSel.selectedIndex].text);
+      if (aSel.value) filtro.push('Asignatura: ' + aSel.options[aSel.selectedIndex].text);
+      ws3.addRow(['Filtros aplicados', filtro.length ? filtro.join(', ') : 'Ninguno (todos los datos)']);
+      ws3.getRows(3, 10)?.forEach(r => {
+        r.getCell(1).font = { bold:true, name:'Calibri', size:11 };
+        r.getCell(2).font = { name:'Calibri', size:11 };
+        r.height = 18;
+      });
+
+      // Generar y descargar
+      const buffer = await wb.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url;
+      a.download = `notas-escolares-${new Date().toISOString().split('T')[0]}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast('✓ Archivo Excel descargado');
+    } catch(e) {
+      toast('Error al generar Excel: ' + e.message, true);
+      console.error(e);
+    } finally {
+      setLoading(btn, false);
+    }
+  }
+</script>
+</body>
+</html>

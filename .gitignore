@@ -1,0 +1,4 @@
+node_modules/
+data/notas.db
+*.db-shm
+*.db-wal

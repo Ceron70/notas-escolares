@@ -1,0 +1,86 @@
+// public/js/app.js — Inicialización y estado global de la app
+const state = {
+  page: 'dashboard',
+  editingId: null,
+  // Caché local (se recarga desde la API al navegar)
+  profesores: [], cursos: [], alumnos: [], asignaturas: [], notas: [],
+};
+
+// ── Helpers UI ────────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+
+const initials   = (n='', a='') => ((n[0]||'') + (a[0]||'')).toUpperCase();
+const fmtNota    = n => (n != null) ? (+n).toFixed(1) : '–';
+const fmtFecha   = s => { if (!s) return ''; const [y,m,d]=s.split('T')[0].split('-'); return `${d}/${m}/${y}`; };
+const notaColor  = n => n>=6.5?'nota-7': n>=5?'nota-5-6': n>=4?'nota-4-5':'nota-low';
+
+function showToast(msg, type='ok') {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  if (type === 'err') t.style.background = 'var(--color-error)';
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2800);
+}
+
+function showLoader(tbodyId, cols) {
+  $(tbodyId).innerHTML = `<tr><td colspan="${cols}" style="text-align:center;padding:var(--space-8);color:var(--color-text-muted)"><i data-lucide="loader-circle" size="20" style="animation:spin 1s linear infinite"></i></td></tr>`;
+  lucide.createIcons();
+}
+
+// ── Navegación ────────────────────────────────────────────────────────────────
+const PAGE_TITLES = { dashboard:'Resumen', notas:'Notas', alumnos:'Alumnos', asignaturas:'Asignaturas', cursos:'Cursos', profesores:'Profesores' };
+const ADD_LABELS  = { notas:'Registrar nota', alumnos:'Nuevo alumno', asignaturas:'Nueva asignatura', cursos:'Nuevo curso', profesores:'Nuevo profesor' };
+
+async function navigate(page) {
+  state.page = page;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  $('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.toggle('active', i.dataset.page === page));
+  $('page-title').textContent = PAGE_TITLES[page];
+  const btn = $('add-btn');
+  if (page === 'dashboard') { btn.style.display = 'none'; }
+  else { btn.style.display = ''; btn.innerHTML = `<i data-lucide="plus" size="14"></i> ${ADD_LABELS[page]}`; }
+  lucide.createIcons();
+  await renderPage(page);
+}
+
+async function renderPage(page) {
+  const map = { dashboard:renderDashboard, notas:renderNotas, alumnos:renderAlumnos,
+                asignaturas:renderAsignaturas, cursos:renderCursos, profesores:renderProfesores };
+  try { await map[page]?.(); }
+  catch(e) { showToast('Error al cargar datos: ' + e.message, 'err'); }
+}
+
+function toggleSidebar() { $('sidebar').classList.toggle('open'); }
+function toggleTheme() {
+  const html = document.documentElement;
+  const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  $('theme-label').textContent = next === 'dark' ? 'Modo oscuro' : 'Modo claro';
+  $('theme-icon').setAttribute('data-lucide', next === 'dark' ? 'moon' : 'sun');
+  lucide.createIcons();
+}
+
+function openAddModal() {
+  state.editingId = null;
+  const map = { notas:openNotaModal, alumnos:openAlumnoModal, asignaturas:openAsigModal, cursos:openCursoModal, profesores:openProfModal };
+  map[state.page]?.();
+}
+function closeModal(id) { $(id).style.display = 'none'; }
+
+// ── DOMContentLoaded ──────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  lucide.createIcons();
+  $('add-btn').style.display = 'none';
+  if (matchMedia('(prefers-color-scheme:dark)').matches) {
+    document.documentElement.setAttribute('data-theme','dark');
+    $('theme-label').textContent = 'Modo oscuro';
+    $('theme-icon').setAttribute('data-lucide','moon');
+    lucide.createIcons();
+  }
+  if (window.innerWidth < 768) $('menu-btn').style.display = 'flex';
+  window.addEventListener('resize', () => { $('menu-btn').style.display = window.innerWidth < 768 ? 'flex' : 'none'; });
+  document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.style.display = 'none'; }));
+  await renderDashboard();
+});
