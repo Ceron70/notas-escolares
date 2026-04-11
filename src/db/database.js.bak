@@ -3,10 +3,10 @@ const initSqlJs = require('sql.js');
 const path      = require('path');
 const fs        = require('fs');
 
-//const dataDir  = path.join(__dirname, '../../data');
 const dataDir = process.env.NODE_ENV === 'production'
-  ? '/data'
+  ? '/tmp'                          // ← único cambio
   : path.join(__dirname, '../../data');
+  
   
 const dbPath   = path.join(dataDir, 'notas.db');
 
