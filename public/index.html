@@ -119,7 +119,9 @@
         <div class="table-search"><i data-lucide="search" size="14" class="search-icon"></i><input type="text" placeholder="Buscar alumno…" id="search-alumnos" oninput="renderAlumnos()"></div>
         <select class="select-input" id="filter-curso-alumnos" onchange="renderAlumnos()"><option value="">Todos los cursos</option></select>
       </div>
-      <div class="table-wrap" style="border-radius:0 0 var(--radius-lg) var(--radius-lg)">
+     <div class="table-wrap" style="border-radius:0 0 var(--radius-lg) var(--radius-lg);overflow-y:auto;max-height:calc(100vh - 220px)">
+	  
+	  
         <table class="data-table"><thead><tr><th>Alumno</th><th>RUT</th><th>Curso</th><th>Email</th><th>Estado</th><th>Promedio</th><th>Acciones</th></tr></thead><tbody id="alumnos-body"></tbody></table>
       </div>
     </div>

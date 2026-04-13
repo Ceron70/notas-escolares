@@ -2,6 +2,7 @@
 const state = {
   page: 'dashboard',
   editingId: null,
+  // Caché local (se recarga desde la API al navegar)
   profesores: [], cursos: [], alumnos: [], asignaturas: [], notas: [],
 };
 
@@ -81,16 +82,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (window.innerWidth < 768) $('menu-btn').style.display = 'flex';
   window.addEventListener('resize', () => { $('menu-btn').style.display = window.innerWidth < 768 ? 'flex' : 'none'; });
   document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.style.display = 'none'; }));
-
-  // ── Paginación: resetear página al buscar o filtrar ───────────────────────
-  $('search-alumnos')?.addEventListener('input', () => {
-    paginaAlumnos.page = 1;
-    renderAlumnos();
-  });
-  $('filter-curso-alumnos')?.addEventListener('change', () => {
-    paginaAlumnos.page = 1;
-    renderAlumnos();
-  });
-
   await renderDashboard();
 });

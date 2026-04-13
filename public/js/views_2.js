@@ -36,22 +36,11 @@ function avgArr(arr) {
 // HELPERS DE PLANTILLA  (piezas reutilizables de HTML)
 // ─────────────────────────────────────────────────────────────────────────────
 
-function avatarCell(nombres, apellidos) {
+function avatarCell(nombres, apellidos, extra = '') {
   return `
     <div style="display:flex;align-items:center;gap:8px">
       <div class="avatar">${initials(nombres, apellidos)}</div>
-      ${nombres} ${apellidos}
-    </div>`;
-}
-
-// Para cuando el nombre viene como string completo (ej: n.alumno_nombre)
-function avatarCellNombre(nombreCompleto) {
-  const partes = nombreCompleto.trim().split(/\s+/);
-  const ini    = initials(partes[0], partes.slice(1).join(' '));
-  return `
-    <div style="display:flex;align-items:center;gap:8px">
-      <div class="avatar">${ini}</div>
-      ${nombreCompleto}
+      ${nombres} ${apellidos}${extra}
     </div>`;
 }
 
@@ -158,7 +147,7 @@ async function populateFilters() {
 function rowNota(n) {
   return `
     <tr>
-      <td>${avatarCellNombre(n.alumno_nombre)}</td>
+      <td>${avatarCell(...n.alumno_nombre.split(' '))}</td>
       <td><span class="chip">${n.curso_nombre || '–'}</span></td>
       <td>${n.asig_nombre}</td>
       <td><span class="chip">${n.tipo}</span></td>
@@ -292,7 +281,7 @@ async function renderDashboard() {
 
     $('recent-notas-body').innerHTML = notas.slice(0, 6).map(n => `
       <tr>
-        <td>${avatarCellNombre(n.alumno_nombre)}</td>
+        <td>${avatarCell(...n.alumno_nombre.split(' '))}</td>
         <td>${n.asig_nombre}</td>
         <td><span class="nota-badge ${notaColor(n.valor)}">${fmtNota(n.valor)}</span></td>
         <td>${fmtFecha(n.fecha)}</td>

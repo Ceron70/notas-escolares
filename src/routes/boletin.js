@@ -6,14 +6,15 @@ router.get('/:alumno_id', async (req, res) => {
   const db = await getDb();
   const { alumno_id } = req.params;
 
-  const alumno = query(db, `
+  const alumnoRows = await query(db, `
     SELECT a.*, c.nombre AS curso_nombre, c.anio
     FROM alumnos a LEFT JOIN cursos c ON a.curso_id = c.id
-    WHERE a.id = ?`, [alumno_id])[0];
+    WHERE a.id = ?`, [alumno_id]);
+  const alumno = alumnoRows[0];
 
   if (!alumno) return res.status(404).json({ error: 'Alumno no encontrado' });
 
-  const notas = query(db, `
+  const notas = await query(db, `
     SELECT n.valor, n.tipo, n.fecha,
            s.id AS asig_id, s.nombre AS asig_nombre,
            p.nombres || ' ' || p.apellidos AS prof_nombre

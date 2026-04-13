@@ -19,6 +19,14 @@
       justify-content:center;z-index:9999;flex-direction:column;gap:var(--space-4) }
     #loader p { color:var(--color-text-muted);font-size:var(--text-sm) }
     #loader svg { animation:spin 1s linear infinite;color:var(--color-primary) }
+    .sidebar-date {
+      font-size: var(--text-xs);
+      color: var(--color-text-faint);
+      padding: var(--space-2) var(--space-4);
+      margin-bottom: var(--space-1);
+      text-transform: capitalize;
+      letter-spacing: 0.02em;
+    }
   </style>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
@@ -51,7 +59,17 @@
     <div class="nav-item" data-page="cursos" onclick="navigate('cursos')"><i data-lucide="building-2" size="16"></i> Cursos</div>
     <div class="nav-item" data-page="profesores" onclick="navigate('profesores')"><i data-lucide="graduation-cap" size="16"></i> Profesores</div>
   </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Reportes</div>
+    <div class="nav-item" onclick="window.open('/boletin.html','_blank')">
+      <i data-lucide="file-text" size="16"></i> Boletín de notas
+    </div>
+    <div class="nav-item" onclick="window.open('/exportar.html','_blank')">
+      <i data-lucide="download" size="16"></i> Exportar notas
+    </div>
+  </div>
   <div class="sidebar-footer">
+    <div class="sidebar-date" id="sidebar-date"></div>
     <div class="nav-item" onclick="toggleTheme()">
       <i data-lucide="sun" size="16" id="theme-icon"></i>
       <span id="theme-label">Modo claro</span>
@@ -101,9 +119,9 @@
         <div class="table-search"><i data-lucide="search" size="14" class="search-icon"></i><input type="text" placeholder="Buscar alumno…" id="search-alumnos" oninput="renderAlumnos()"></div>
         <select class="select-input" id="filter-curso-alumnos" onchange="renderAlumnos()"><option value="">Todos los cursos</option></select>
       </div>
-      <div class="table-wrap" style="border-radius:0 0 var(--radius-lg) var(--radius-lg)">
-        <table class="data-table"><thead><tr><th>Alumno</th><th>RUT</th><th>Curso</th><th>Email</th><th>Estado</th><th>Promedio</th><th>Acciones</th></tr></thead><tbody id="alumnos-body"></tbody></table>
-      </div>
+    
+	<div class="table-wrap" style="border-radius:0 0 var(--radius-lg) var(--radius-lg);overflow-y:auto;max-height:calc(100vh - 220px)">
+	
     </div>
     <!-- ASIGNATURAS -->
     <div class="page" id="page-asignaturas">
@@ -134,7 +152,8 @@
     <div class="modal-header"><span class="modal-title" id="modal-nota-title">Nota</span><button class="icon-btn" onclick="closeModal('modal-nota')"><i data-lucide="x" size="18"></i></button></div>
     <div class="modal-body">
       <div class="form-row"><div class="form-group"><label class="form-label">Alumno *</label><select class="form-input" id="nota-alumno"></select></div><div class="form-group"><label class="form-label">Asignatura *</label><select class="form-input" id="nota-asig"></select></div></div>
-      <div class="form-row"><div class="form-group"><label class="form-label">Nota (1.0–7.0) *</label><input type="number" class="form-input" id="nota-valor" min="1" max="7" step="0.1"></div><div class="form-group"><label class="form-label">Tipo</label><select class="form-input" id="nota-tipo"><option>Prueba</option><option>Control</option><option>Tarea</option><option>Trabajo</option><option>Examen</option><option>Disertación</option></select></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Nota (1.0–7.0) *</label><input type="number" class="form-input" id="nota-valor" min="1" max="7" step="0.1"></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Profesor</label><select class="form-input" id="nota-prof"></select></div><div class="form-group"><label class="form-label">Tipo</label><select class="form-input" id="nota-tipo"><option>Prueba</option><option>Control</option><option>Tarea</option><option>Trabajo</option><option>Examen</option><option>Disertación</option></select></div></div>
       <div class="form-row"><div class="form-group"><label class="form-label">Fecha</label><input type="date" class="form-input" id="nota-fecha"></div><div class="form-group"><label class="form-label">Observación</label><input type="text" class="form-input" id="nota-obs"></div></div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-nota')">Cancelar</button><button class="btn btn-primary" onclick="saveNota()">Guardar</button></div>
@@ -197,6 +216,18 @@
       document.getElementById('sidebar').style.display = '';
       document.getElementById('main').style.display = '';
     }, 300);
+
+    // Fecha actual en sidebar
+    function actualizarFecha() {
+      const ahora = new Date();
+      const opciones = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+      const fecha = ahora.toLocaleDateString('es-CL', opciones);
+      const hora  = ahora.toLocaleTimeString('es-CL', { hour:'2-digit', minute:'2-digit' });
+      const el = document.getElementById('sidebar-date');
+      if (el) el.textContent = `${fecha} · ${hora}`;
+    }
+    actualizarFecha();
+    setInterval(actualizarFecha, 60000); // actualiza cada minuto
   });
 </script>
 </body>

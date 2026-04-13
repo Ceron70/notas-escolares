@@ -24,12 +24,3 @@
   border-radius:var(--radius-md);background:var(--color-bg);font-size:var(--text-sm);
   color:var(--color-text);cursor:pointer}
 .select-input:focus{border-color:var(--color-primary);outline:none}
-
-/* Encabezados fijos al hacer scroll */
-.table-wrap thead th {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: var(--color-surface);
-}
-

@@ -28,8 +28,3 @@
   #sidebar{position:fixed;z-index:200;height:100dvh;transform:translateX(-100%);transition:transform var(--transition)}
   #sidebar.open{transform:translateX(0)}
 }
-/* Contenedor de la tabla con scroll interno */
-.table-wrapper {
-  overflow-y: auto;
-  max-height: calc(100vh - 200px);
-}

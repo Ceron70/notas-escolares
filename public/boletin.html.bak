@@ -226,9 +226,7 @@
 <script>
   // Cargar alumnos al iniciar
   (async () => {
-    const resp = await fetch('/api/alumnos?limit=1000').then(r => r.json());
-	const alumnos = Array.isArray(resp) ? resp : resp.data;
-
+    const alumnos = await fetch('/api/alumnos').then(r => r.json());
     const sel = document.getElementById('sel-alumno');
     sel.innerHTML = '<option value="">-- Selecciona un alumno --</option>' +
       alumnos.map(a => `<option value="${a.id}">${a.apellidos}, ${a.nombres} (${a.curso_nombre || ''})</option>`).join('');
