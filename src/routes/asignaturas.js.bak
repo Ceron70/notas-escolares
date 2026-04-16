@@ -3,16 +3,12 @@ const { getDb, query, run } = require('../db/database');
 
 router.get('/', async (req, res) => {
   const db = await getDb();
-  res.json(await query(db, 'SELECT id, nombre, codigo, horas, "desc" FROM asignaturas ORDER BY nombre'));
+  res.json(await query(db, 'SELECT * FROM asignaturas ORDER BY nombre'));
 });
 
 router.get('/:id', async (req, res) => {
   const db = await getDb();
-  const rows = await query(
-    db,
-    'SELECT id, nombre, codigo, horas, "desc" FROM asignaturas WHERE id = $1',
-    [req.params.id]
-  );
+  const rows = await query(db, 'SELECT * FROM asignaturas WHERE id = $1', [req.params.id]);
   if (!rows.length) return res.status(404).json({ error: 'No encontrado' });
   res.json(rows[0]);
 });
@@ -24,7 +20,7 @@ router.post('/', async (req, res) => {
   const db = await getDb();
   const info = await run(
     db,
-    'INSERT INTO asignaturas (nombre, codigo, horas, "desc") VALUES ($1, $2, $3, $4) RETURNING id',
+    'INSERT INTO asignaturas (nombre, codigo, horas, desc) VALUES ($1, $2, $3, $4) RETURNING id',
     [nombre, codigo, horas, desc]
   );
 
@@ -34,13 +30,11 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   const { nombre, codigo, horas, desc } = req.body;
   const db = await getDb();
-
   await run(
     db,
-    'UPDATE asignaturas SET nombre = $1, codigo = $2, horas = $3, "desc" = $4 WHERE id = $5',
+    'UPDATE asignaturas SET nombre = $1, codigo = $2, horas = $3, desc = $4 WHERE id = $5',
     [nombre, codigo, horas, desc, req.params.id]
   );
-
   res.json({ ok: true });
 });
 

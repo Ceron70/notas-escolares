@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+ 
+
+  <title>Rendimiento por asignatura</title>
+  
+
+
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #d9dde7;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --danger: #b91c1c;
+      --success: #166534;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      --radius: 14px;
+    }
+	  .back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  background: #e5e7eb;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.back-link:hover {
+  background: #d1d5db;
+}
+
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .header {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .btn-secondary:hover {
+      background: #d1d5db;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .status {
+      margin-bottom: 16px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .status.error {
+      color: var(--danger);
+    }
+
+    .status.ok {
+      color: var(--success);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    thead th {
+      text-align: left;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--line);
+      padding: 12px 10px;
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    tbody tr:hover {
+      background: #f9fafb;
+    }
+
+    .empty {
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .badge.good { background: #dcfce7; color: #166534; }
+    .badge.warn { background: #fef3c7; color: #92400e; }
+    .badge.bad { background: #fee2e2; color: #991b1b; }
+
+    .number {
+      font-variant-numeric: tabular-nums;
+    }
+
+    @media (max-width: 768px) {
+      .wrap { padding: 16px; }
+      h1 { font-size: 22px; }
+      .header, .card { padding: 16px; }
+      .actions { flex-direction: column; }
+      button { width: 100%; }
+    }
+	
+	.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  background: #e5e7eb;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.back-link:hover {
+  background: #d1d5db;
+}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="header">
+  <div class="header-top">
+    <a href="/reportes.html" class="back-link">← Volver a informes</a>
+  </div>
+  <h1>Rendimiento por asignatura</h1>
+  
+      <p class="subtitle">
+        Revisa cuáles materias tienen mejor promedio, más aprobaciones y cuáles concentran más reprobación.
+      </p>
+      <div class="actions">
+        <button class="btn-primary" id="btnCargar">Cargar datos</button>
+        <button class="btn-secondary" id="btnLimpiar">Limpiar</button>
+      </div>
+    </header>
+
+    <section class="card">
+      <div id="status" class="status">Haz clic en “Cargar datos” para ver el informe.</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Asignatura</th>
+              <th>Cantidad</th>
+              <th>Promedio</th>
+              <th>Mínima</th>
+              <th>Máxima</th>
+              <th>Aprobados</th>
+              <th>Reprobados</th>
+              <th>% Aprobación</th>
+              <th>% Reprobación</th>
+            </tr>
+          </thead>
+          <tbody id="tablaBody">
+            <tr>
+              <td colspan="9" class="empty">No hay datos cargados todavía.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const API_URL = "http://localhost:3000/api/reportes/rendimiento-asignaturas";
+    const statusEl = document.getElementById("status");
+    const tbody = document.getElementById("tablaBody");
+    const btnCargar = document.getElementById("btnCargar");
+    const btnLimpiar = document.getElementById("btnLimpiar");
+
+    function setStatus(msg, type = "") {
+      statusEl.textContent = msg;
+      statusEl.className = "status" + (type ? " " + type : "");
+    }
+
+    function badgeForAverage(avg) {
+      const value = Number(avg);
+      if (value >= 5.0) return "good";
+      if (value >= 4.0) return "warn";
+      return "bad";
+    }
+
+    function renderRows(data) {
+      if (!data.length) {
+        tbody.innerHTML = `<tr><td colspan="9" class="empty">No hay registros para mostrar.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = data.map(row => {
+        const promedio = Number(row.promedio ?? 0);
+        const badge = badgeForAverage(promedio);
+
+        return `
+          <tr>
+            <td>${row.asignatura ?? ""}</td>
+            <td class="number">${row.cantidad_notas ?? 0}</td>
+            <td class="number"><span class="badge ${badge}">${promedio.toFixed(2)}</span></td>
+            <td class="number">${Number(row.nota_minima ?? 0).toFixed(2)}</td>
+            <td class="number">${Number(row.nota_maxima ?? 0).toFixed(2)}</td>
+            <td class="number">${row.aprobados ?? 0}</td>
+            <td class="number">${row.reprobados ?? 0}</td>
+            <td class="number">${Number(row.porcentaje_aprobacion ?? 0).toFixed(2)}%</td>
+            <td class="number">${Number(row.porcentaje_reprobacion ?? 0).toFixed(2)}%</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    async function cargarDatos() {
+      setStatus("Cargando datos...", "");
+      try {
+        const response = await fetch(API_URL);
+        const result = await response.json();
+
+        if (!response.ok || !result.ok) {
+          throw new Error(result.error || "No se pudo cargar el informe");
+        }
+
+        renderRows(result.data || []);
+        setStatus(`Informe cargado correctamente. Total de asignaturas: ${result.total}`, "ok");
+      } catch (error) {
+        tbody.innerHTML = `<tr><td colspan="9" class="empty">No se pudo cargar el reporte.</td></tr>`;
+        setStatus(`Error: ${error.message}`, "error");
+      }
+    }
+
+    function limpiarTabla() {
+      tbody.innerHTML = `<tr><td colspan="9" class="empty">No hay datos cargados todavía.</td></tr>`;
+      setStatus("Tabla limpia. Puedes volver a cargar el informe.", "");
+    }
+
+    btnCargar.addEventListener("click", cargarDatos);
+    btnLimpiar.addEventListener("click", limpiarTabla);
+  </script>
+</body>
+</html>

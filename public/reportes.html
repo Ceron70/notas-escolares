@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Informes | Notas Escolares</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <style>
+    :root {
+      --primary: #01696f;
+      --primary-h: #0c4e54;
+      --text: #28251d;
+      --muted: #7a7974;
+      --faint: #bab9b4;
+      --border: #d4d1ca;
+      --bg: #f7f6f2;
+      --surface: #ffffff;
+      --surface-2: #f9f8f5;
+      --surface-3: #f1efea;
+      --primary-soft: #dbe8e6;
+      --success: #437a22;
+      --error: #a12c7b;
+      --radius-sm: .5rem;
+      --radius-md: .75rem;
+      --radius-lg: 1rem;
+      --shadow-sm: 0 4px 12px rgba(0,0,0,.06);
+      --shadow-md: 0 10px 24px rgba(0,0,0,.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      min-height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .reports-shell {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 2rem 1rem 3rem;
+    }
+
+    .reports-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding: 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .reports-title h1 {
+      font-size: 2rem;
+      line-height: 1.1;
+      font-family: "Instrument Serif", serif;
+      font-weight: 500;
+      margin-bottom: .5rem;
+    }
+
+    .reports-title p {
+      color: var(--muted);
+      max-width: 62ch;
+      font-size: .95rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
+      text-decoration: none;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: .9rem;
+      padding: .85rem 1rem;
+      white-space: nowrap;
+      font-weight: 600;
+      transition: background .18s ease, border-color .18s ease;
+    }
+
+    .back-link:hover {
+      background: var(--surface-3);
+      border-color: #c8c4bc;
+    }
+
+    .reports-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 1.15rem;
+    }
+
+    .report-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.4rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      min-height: 250px;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+
+    .report-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: #c7c2ba;
+    }
+
+    .report-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: .8rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary-soft);
+      color: var(--primary);
+      margin-bottom: 1rem;
+      flex-shrink: 0;
+    }
+
+    .report-card h2 {
+      font-size: 1.05rem;
+      line-height: 1.25;
+      margin-bottom: .9rem;
+      font-weight: 700;
+    }
+
+    .report-card p {
+      color: var(--muted);
+      font-size: .95rem;
+      line-height: 1.65;
+      margin-bottom: 1.25rem;
+      flex: 1;
+    }
+
+    .report-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .75rem;
+      margin-top: auto;
+    }
+
+    .report-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
+      text-decoration: none;
+      padding: .8rem 1rem;
+      border-radius: .9rem;
+      border: 1px solid var(--primary);
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+      transition: background .18s ease, border-color .18s ease, transform .18s ease;
+    }
+
+    .report-btn:hover {
+      background: var(--primary-h);
+      border-color: var(--primary-h);
+      transform: translateY(-1px);
+    }
+
+    .hint-box {
+      margin-top: 1.5rem;
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: 1rem;
+      padding: 1rem 1.1rem;
+      color: var(--muted);
+    }
+
+    .hint-box strong {
+      color: var(--text);
+    }
+
+    @media (max-width: 768px) {
+      .reports-shell {
+        padding: 1rem .9rem 2rem;
+      }
+
+      .reports-header {
+        flex-direction: column;
+      }
+
+      .back-link {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="reports-shell">
+
+    <section class="reports-header">
+      <div class="reports-title">
+        <h1>Informes</h1>
+        <p>
+          Desde aquí puedes abrir los reportes del sistema y revisar el comportamiento académico
+          por asignatura, alumnos, cursos y profesores.
+        </p>
+      </div>
+
+      <a class="back-link" href="/index.html">
+        <i data-lucide="arrow-left" size="16"></i>
+        Volver al sistema
+      </a>
+    </section>
+
+    <section class="reports-grid">
+
+      <article class="report-card">
+        <div class="report-icon">
+          <i data-lucide="bar-chart-3" size="20"></i>
+        </div>
+        <h2>Rendimiento por asignatura</h2>
+        <p>
+          Muestra promedio, nota mínima, nota máxima, aprobados, reprobados y porcentajes por cada asignatura registrada.
+        </p>
+        <div class="report-actions">
+          <a class="report-btn" href="/rendimiento-asignaturas.html">
+            <i data-lucide="external-link" size="16"></i>
+            Abrir informe
+          </a>
+        </div>
+      </article>
+
+      <article class="report-card">
+        <div class="report-icon">
+          <i data-lucide="trophy" size="20"></i>
+        </div>
+        <h2>Ranking por curso</h2>
+        <p>
+          Compara cursos por promedio general, aprobación y alumnos en situación crítica. Útil para una vista administrativa del rendimiento.
+        </p>
+        <div class="report-actions">
+          <a class="report-btn" href="/ranking-cursos.html">
+            <i data-lucide="external-link" size="16"></i>
+            Abrir ranking
+          </a>
+        </div>
+      </article>
+
+      <article class="report-card">
+        <div class="report-icon">
+          <i data-lucide="alert-triangle" size="20"></i>
+        </div>
+        <h2>Alumnos en riesgo</h2>
+        <p>
+          Identifica alumnos con promedio bajo, pocas evaluaciones o señales de riesgo académico dentro del sistema principal.
+        </p>
+        <div class="report-actions">
+          <a class="report-btn" href="/alumnos-riesgo.html">
+            <i data-lucide="external-link" size="16"></i>
+            Ver alumnos en riesgo
+          </a>
+        </div>
+      </article>
+
+      <article class="report-card">
+        <div class="report-icon">
+          <i data-lucide="file-text" size="20"></i>
+        </div>
+        <h2>Boletín de notas</h2>
+        <p>
+          Abre la vista del boletín para consultar o imprimir el detalle académico de los alumnos.
+        </p>
+        <div class="report-actions">
+          <a class="report-btn" href="/boletin.html">
+            <i data-lucide="book-open-text" size="16"></i>
+            Ver boletín
+          </a>
+        </div>
+      </article>
+
+      <article class="report-card">
+        <div class="report-icon">
+          <i data-lucide="file-down" size="20"></i>
+        </div>
+        <h2>Exportación</h2>
+        <p>
+          Accede a la página de exportación para descargar información del sistema y generar archivos CSV o Excel.
+        </p>
+        <div class="report-actions">
+          <a class="report-btn" href="/exportar.html">
+            <i data-lucide="download" size="16"></i>
+            Ir a exportar
+          </a>
+        </div>
+      </article>
+
+      <article class="report-card">
+        <div class="report-icon">
+          <i data-lucide="medal" size="20"></i>
+        </div>
+        <h2>Top 10 alumnos</h2>
+        <p>
+          Los alumnos con mejor promedio general del sistema, con su curso y cantidad de evaluaciones registradas.
+        </p>
+        <div class="report-actions">
+          <a class="report-btn" href="/top-alumnos.html">
+            <i data-lucide="external-link" size="16"></i>
+            Ver ranking
+          </a>
+        </div>
+      </article>
+
+      <article class="report-card">
+        <div class="report-icon">
+          <i data-lucide="clock-3" size="20"></i>
+        </div>
+        <h2>Historial por alumno</h2>
+        <p>
+          Consulta el historial completo de evaluaciones de un alumno, ordenado por fecha, con asignatura, tipo y profesor.
+        </p>
+        <div class="report-actions">
+          <a class="report-btn" href="/historial-alumno.html">
+            <i data-lucide="external-link" size="16"></i>
+            Ver historial
+          </a>
+        </div>
+      </article>
+
+      <article class="report-card">
+        <div class="report-icon">
+          <i data-lucide="users" size="20"></i>
+        </div>
+        <h2>Profesores con más evaluaciones</h2>
+        <p>
+          Ranking de profesores según la cantidad de evaluaciones registradas, alumnos evaluados y actividad reciente.
+        </p>
+        <div class="report-actions">
+          <a class="report-btn" href="/profesores-activos.html">
+            <i data-lucide="external-link" size="16"></i>
+            Ver ranking
+          </a>
+        </div>
+      </article>
+
+    </section>
+
+    <section class="hint-box">
+      <strong>Sugerencia:</strong> usa esta página como punto central para todos los reportes del sistema.
+    </section>
+
+  </main>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

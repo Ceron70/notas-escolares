@@ -14,38 +14,11 @@
   <link rel="stylesheet" href="/css/table.css">
   <link rel="stylesheet" href="/css/forms.css">
   <style>
-    :root {
-      --sidebar-mobile-width: min(84vw, 320px);
-    }
-
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    html, body {
-      overflow-x: hidden;
-    }
-
-    #loader {
-      position: fixed;
-      inset: 0;
-      background: var(--color-bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      flex-direction: column;
-      gap: var(--space-4);
-    }
-
-    #loader p {
-      color: var(--color-text-muted);
-      font-size: var(--text-sm);
-    }
-
-    #loader svg {
-      animation: spin 1s linear infinite;
-      color: var(--color-primary);
-    }
-
+    #loader { position:fixed;inset:0;background:var(--color-bg);display:flex;align-items:center;
+      justify-content:center;z-index:9999;flex-direction:column;gap:var(--space-4) }
+    #loader p { color:var(--color-text-muted);font-size:var(--text-sm) }
+    #loader svg { animation:spin 1s linear infinite;color:var(--color-primary) }
     .sidebar-date {
       font-size: var(--text-xs);
       color: var(--color-text-faint);
@@ -54,94 +27,12 @@
       text-transform: capitalize;
       letter-spacing: 0.02em;
     }
-
-    .mobile-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(17, 24, 39, 0.38);
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transition: opacity .22s ease, visibility .22s ease;
-      z-index: 1190;
-    }
-
-    .sidebar-close-btn {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      background: var(--color-surface);
-      color: var(--color-text);
-      margin-left: auto;
-      margin-bottom: var(--space-3);
-      cursor: pointer;
-    }
-
-    @media (max-width: 768px) {
-      #sidebar {
-        position: fixed !important;
-        top: 0;
-        left: 0;
-        height: 100dvh;
-        width: var(--sidebar-mobile-width);
-        max-width: 320px;
-        z-index: 1200;
-        transform: translateX(-104%);
-        transition: transform .24s ease;
-        box-shadow: var(--shadow-lg);
-        display: block !important;
-      }
-
-      body.sidebar-open #sidebar {
-        transform: translateX(0);
-      }
-
-      body.sidebar-open .mobile-overlay {
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto;
-      }
-
-      #main {
-        margin-left: 0 !important;
-        width: 100%;
-      }
-
-      #menu-btn {
-        display: inline-flex !important;
-      }
-
-      .sidebar-close-btn {
-        display: inline-flex;
-      }
-    }
-
-    @media (min-width: 769px) {
-      .mobile-overlay {
-        display: none !important;
-      }
-
-      .sidebar-close-btn {
-        display: none !important;
-      }
-
-      #menu-btn {
-        display: none !important;
-      }
-
-      body {
-        overflow: auto !important;
-      }
-    }
   </style>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
 
+<!-- Pantalla de carga inicial -->
 <div id="loader">
   <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -150,52 +41,47 @@
   <p>Cargando…</p>
 </div>
 
-<div class="mobile-overlay" id="mobile-overlay" onclick="closeSidebar()"></div>
-
+<!-- ===================== SIDEBAR ===================== -->
 <nav id="sidebar" style="display:none">
-  <button class="sidebar-close-btn" type="button" onclick="closeSidebar()" aria-label="Cerrar menú">
-    <i data-lucide="x" size="18"></i>
-  </button>
-
   <div class="sidebar-logo">
     <img src="/assets/logo.svg" width="28" height="28" alt="Logo" loading="lazy">
     <span class="logo-text">Notas Escolares</span>
   </div>
-
   <div class="sidebar-section">
     <div class="sidebar-label">Principal</div>
-    <div class="nav-item active" data-page="dashboard" onclick="navigateSafe('dashboard')"><i data-lucide="layout-dashboard" size="16"></i> Resumen</div>
-    <div class="nav-item" data-page="notas" onclick="navigateSafe('notas')"><i data-lucide="clipboard-list" size="16"></i> Notas</div>
-    <div class="nav-item" data-page="alumnos" onclick="navigateSafe('alumnos')"><i data-lucide="users" size="16"></i> Alumnos</div>
+    <div class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')"><i data-lucide="layout-dashboard" size="16"></i> Resumen</div>
+    <div class="nav-item" data-page="notas" onclick="navigate('notas')"><i data-lucide="clipboard-list" size="16"></i> Notas</div>
+    <div class="nav-item" data-page="alumnos" onclick="navigate('alumnos')"><i data-lucide="users" size="16"></i> Alumnos</div>
   </div>
-
   <div class="sidebar-section">
     <div class="sidebar-label">Configuración</div>
-    <div class="nav-item" data-page="asignaturas" onclick="navigateSafe('asignaturas')"><i data-lucide="book-open" size="16"></i> Asignaturas</div>
-    <div class="nav-item" data-page="cursos" onclick="navigateSafe('cursos')"><i data-lucide="building-2" size="16"></i> Cursos</div>
-    <div class="nav-item" data-page="profesores" onclick="navigateSafe('profesores')"><i data-lucide="graduation-cap" size="16"></i> Profesores</div>
+    <div class="nav-item" data-page="asignaturas" onclick="navigate('asignaturas')"><i data-lucide="book-open" size="16"></i> Asignaturas</div>
+    <div class="nav-item" data-page="cursos" onclick="navigate('cursos')"><i data-lucide="building-2" size="16"></i> Cursos</div>
+    <div class="nav-item" data-page="profesores" onclick="navigate('profesores')"><i data-lucide="graduation-cap" size="16"></i> Profesores</div>
   </div>
-
+  
   <div class="sidebar-section">
-    <div class="sidebar-label">Reportes</div>
+  <div class="sidebar-label">Reportes</div>
 
-    <div class="nav-item" data-page="riesgo" onclick="navigateSafe('riesgo')">
-      <i data-lucide="alert-triangle" size="16"></i> Alumnos en riesgo
-    </div>
-
-    <div class="nav-item" onclick="window.open('/reportes.html','_blank')">
-      <i data-lucide="folder-kanban" size="16"></i> Informes
-    </div>
-
-    <div class="nav-item" onclick="window.open('/boletin.html','_blank')">
-      <i data-lucide="file-text" size="16"></i> Boletín de notas
-    </div>
-
-    <div class="nav-item" onclick="window.open('/exportar.html','_blank')">
-      <i data-lucide="download" size="16"></i> Exportar notas
-    </div>
+  <div class="nav-item" data-page="riesgo" onclick="navigate('riesgo')">
+    <i data-lucide="alert-triangle" size="16"></i> Alumnos en riesgo
   </div>
 
+  <div class="nav-item" onclick="window.open('/reportes.html','_blank')">
+    <i data-lucide="folder-kanban" size="16"></i> Informes
+  </div>
+
+  <div class="nav-item" onclick="window.open('/boletin.html','_blank')">
+    <i data-lucide="file-text" size="16"></i> Boletín de notas
+  </div>
+
+  <div class="nav-item" onclick="window.open('/exportar.html','_blank')">
+    <i data-lucide="download" size="16"></i> Exportar notas
+  </div>
+</div>
+
+  
+  
   <div class="sidebar-footer">
     <div class="sidebar-date" id="sidebar-date"></div>
     <div class="nav-item" onclick="toggleTheme()">
@@ -205,15 +91,12 @@
   </div>
 </nav>
 
+<!-- ===================== MAIN ===================== -->
 <div id="main" style="display:none">
   <header id="topbar">
-    <button class="icon-btn" style="display:none" id="menu-btn" onclick="toggleSidebar()" aria-label="Menú">
-      <i data-lucide="menu" size="20"></i>
-    </button>
+    <button class="icon-btn" style="display:none" id="menu-btn" onclick="toggleSidebar()" aria-label="Menú"><i data-lucide="menu" size="20"></i></button>
     <div class="topbar-title" id="page-title">Resumen</div>
-    <button class="btn btn-primary" id="add-btn" onclick="openAddModal()">
-      <i data-lucide="plus" size="14"></i> Agregar
-    </button>
+    <button class="btn btn-primary" id="add-btn" onclick="openAddModal()"><i data-lucide="plus" size="14"></i> Agregar</button>
   </header>
 
   <main id="content">
@@ -223,101 +106,59 @@
       <div class="two-col">
         <div class="table-wrap">
           <div class="table-header"><span style="font-weight:600;font-size:var(--text-sm)">Últimas notas registradas</span></div>
-          <table class="data-table">
-            <thead><tr><th>Alumno</th><th>Asignatura</th><th>Nota</th><th>Fecha</th></tr></thead>
-            <tbody id="recent-notas-body"></tbody>
-          </table>
+          <table class="data-table"><thead><tr><th>Alumno</th><th>Asignatura</th><th>Nota</th><th>Fecha</th></tr></thead><tbody id="recent-notas-body"></tbody></table>
         </div>
         <div class="table-wrap">
           <div class="table-header"><span style="font-weight:600;font-size:var(--text-sm)">Promedio por asignatura</span></div>
-          <table class="data-table">
-            <thead><tr><th>Asignatura</th><th>Promedio</th><th>Distribución</th></tr></thead>
-            <tbody id="prom-asig-body"></tbody>
-          </table>
+          <table class="data-table"><thead><tr><th>Asignatura</th><th>Promedio</th><th>Distribución</th></tr></thead><tbody id="prom-asig-body"></tbody></table>
         </div>
       </div>
     </div>
-
     <!-- NOTAS -->
     <div class="page" id="page-notas">
       <div class="table-header" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg) var(--radius-lg) 0 0;border-bottom:none">
-        <div class="table-search">
-          <i data-lucide="search" size="14" class="search-icon"></i>
-          <input type="text" placeholder="Buscar alumno o asignatura…" id="search-notas" oninput="renderNotas()">
-        </div>
+        <div class="table-search"><i data-lucide="search" size="14" class="search-icon"></i><input type="text" placeholder="Buscar alumno o asignatura…" id="search-notas" oninput="renderNotas()"></div>
         <div class="filter-bar">
           <select class="select-input" id="filter-curso" onchange="renderNotas()"><option value="">Todos los cursos</option></select>
-          <select class="select-input" id="filter-asig" onchange="renderNotas()"><option value="">Todas las asignaturas</option></select>
+          <select class="select-input" id="filter-asig"  onchange="renderNotas()"><option value="">Todas las asignaturas</option></select>
         </div>
       </div>
       <div class="table-wrap" style="border-radius:0 0 var(--radius-lg) var(--radius-lg)">
-        <table class="data-table">
-          <thead><tr><th>Alumno</th><th>Curso</th><th>Asignatura</th><th>Tipo</th><th>Nota</th><th>Fecha</th><th>Profesor</th><th>Acciones</th></tr></thead>
-          <tbody id="notas-body"></tbody>
-        </table>
+        <table class="data-table"><thead><tr><th>Alumno</th><th>Curso</th><th>Asignatura</th><th>Tipo</th><th>Nota</th><th>Fecha</th><th>Profesor</th><th>Acciones</th></tr></thead><tbody id="notas-body"></tbody></table>
       </div>
     </div>
-
     <!-- ALUMNOS -->
     <div class="page" id="page-alumnos">
       <div class="table-header" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg) var(--radius-lg) 0 0;border-bottom:none">
-        <div class="table-search">
-          <i data-lucide="search" size="14" class="search-icon"></i>
-          <input type="text" placeholder="Buscar alumno…" id="search-alumnos" oninput="renderAlumnos()">
-        </div>
+        <div class="table-search"><i data-lucide="search" size="14" class="search-icon"></i><input type="text" placeholder="Buscar alumno…" id="search-alumnos" oninput="renderAlumnos()"></div>
         <select class="select-input" id="filter-curso-alumnos" onchange="renderAlumnos()"><option value="">Todos los cursos</option></select>
       </div>
       <div class="table-wrap" style="border-radius:0 0 var(--radius-lg) var(--radius-lg);overflow-y:auto;max-height:calc(100vh - 220px)">
-        <table class="data-table">
-          <thead><tr><th>Alumno</th><th>RUT</th><th>Curso</th><th>Email</th><th>Estado</th><th>Promedio</th><th>Acciones</th></tr></thead>
-          <tbody id="alumnos-body"></tbody>
-        </table>
+        <table class="data-table"><thead><tr><th>Alumno</th><th>RUT</th><th>Curso</th><th>Email</th><th>Estado</th><th>Promedio</th><th>Acciones</th></tr></thead><tbody id="alumnos-body"></tbody></table>
       </div>
     </div>
-
     <!-- ASIGNATURAS -->
     <div class="page" id="page-asignaturas">
       <div class="table-wrap">
-        <div class="table-header">
-          <div class="table-search">
-            <i data-lucide="search" size="14" class="search-icon"></i>
-            <input type="text" placeholder="Buscar asignatura…" id="search-asig" oninput="renderAsignaturas()">
-          </div>
-        </div>
-        <table class="data-table">
-          <thead><tr><th>Nombre</th><th>Código</th><th>Horas sem.</th><th>Descripción</th><th>Acciones</th></tr></thead>
-          <tbody id="asig-body"></tbody>
-        </table>
+        <div class="table-header"><div class="table-search"><i data-lucide="search" size="14" class="search-icon"></i><input type="text" placeholder="Buscar asignatura…" id="search-asig" oninput="renderAsignaturas()"></div></div>
+        <table class="data-table"><thead><tr><th>Nombre</th><th>Código</th><th>Horas sem.</th><th>Descripción</th><th>Acciones</th></tr></thead><tbody id="asig-body"></tbody></table>
       </div>
     </div>
-
     <!-- CURSOS -->
     <div class="page" id="page-cursos">
       <div class="table-wrap">
-        <table class="data-table">
-          <thead><tr><th>Nombre</th><th>Nivel</th><th>Jefe de Curso</th><th>Alumnos</th><th>Año</th><th>Acciones</th></tr></thead>
-          <tbody id="cursos-body"></tbody>
-        </table>
+        <table class="data-table"><thead><tr><th>Nombre</th><th>Nivel</th><th>Jefe de Curso</th><th>Alumnos</th><th>Año</th><th>Acciones</th></tr></thead><tbody id="cursos-body"></tbody></table>
       </div>
     </div>
-
     <!-- PROFESORES -->
     <div class="page" id="page-profesores">
       <div class="table-wrap">
-        <div class="table-header">
-          <div class="table-search">
-            <i data-lucide="search" size="14" class="search-icon"></i>
-            <input type="text" placeholder="Buscar profesor…" id="search-prof" oninput="renderProfesores()">
-          </div>
-        </div>
-        <table class="data-table">
-          <thead><tr><th>Nombre</th><th>RUT</th><th>Email</th><th>Especialidad</th><th>Estado</th><th>Acciones</th></tr></thead>
-          <tbody id="prof-body"></tbody>
-        </table>
+        <div class="table-header"><div class="table-search"><i data-lucide="search" size="14" class="search-icon"></i><input type="text" placeholder="Buscar profesor…" id="search-prof" oninput="renderProfesores()"></div></div>
+        <table class="data-table"><thead><tr><th>Nombre</th><th>RUT</th><th>Email</th><th>Especialidad</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="prof-body"></tbody></table>
       </div>
     </div>
 
-    <!-- ALUMNOS EN RIESGO -->
+    <!-- ← NUEVA PÁGINA: ALUMNOS EN RIESGO -->
     <div class="page" id="page-riesgo">
       <div class="table-header" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg) var(--radius-lg) 0 0;border-bottom:none">
         <div style="display:flex;align-items:center;gap:var(--space-2)">
@@ -349,6 +190,7 @@
         </table>
       </div>
     </div>
+
   </main>
 </div>
 
@@ -365,7 +207,6 @@
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-nota')">Cancelar</button><button class="btn btn-primary" onclick="saveNota()">Guardar</button></div>
   </div>
 </div>
-
 <div class="overlay" id="modal-alumno" style="display:none">
   <div class="modal">
     <div class="modal-header"><span class="modal-title">Alumno</span><button class="icon-btn" onclick="closeModal('modal-alumno')"><i data-lucide="x" size="18"></i></button></div>
@@ -378,7 +219,6 @@
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-alumno')">Cancelar</button><button class="btn btn-primary" onclick="saveAlumno()">Guardar</button></div>
   </div>
 </div>
-
 <div class="overlay" id="modal-asig" style="display:none">
   <div class="modal">
     <div class="modal-header"><span class="modal-title">Asignatura</span><button class="icon-btn" onclick="closeModal('modal-asig')"><i data-lucide="x" size="18"></i></button></div>
@@ -389,7 +229,6 @@
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-asig')">Cancelar</button><button class="btn btn-primary" onclick="saveAsignatura()">Guardar</button></div>
   </div>
 </div>
-
 <div class="overlay" id="modal-curso" style="display:none">
   <div class="modal">
     <div class="modal-header"><span class="modal-title">Curso</span><button class="icon-btn" onclick="closeModal('modal-curso')"><i data-lucide="x" size="18"></i></button></div>
@@ -400,7 +239,6 @@
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-curso')">Cancelar</button><button class="btn btn-primary" onclick="saveCurso()">Guardar</button></div>
   </div>
 </div>
-
 <div class="overlay" id="modal-prof" style="display:none">
   <div class="modal">
     <div class="modal-header"><span class="modal-title">Profesor</span><button class="icon-btn" onclick="closeModal('modal-prof')"><i data-lucide="x" size="18"></i></button></div>
@@ -413,50 +251,17 @@
   </div>
 </div>
 
+<!-- Scripts en orden correcto -->
 <script src="/js/api.js"></script>
 <script src="/js/app.js"></script>
 <script src="/js/views.js"></script>
 <script src="/js/modals.js"></script>
 <script>
-  function isMobileNav() {
-    return window.innerWidth <= 768;
-  }
-
-  function toggleSidebar(force) {
-    const shouldOpen = typeof force === 'boolean'
-      ? force
-      : !document.body.classList.contains('sidebar-open');
-
-    if (!isMobileNav()) return;
-
-    document.body.classList.toggle('sidebar-open', shouldOpen);
-  }
-
-  function closeSidebar() {
-    document.body.classList.remove('sidebar-open');
-  }
-
-  function navigateSafe(page) {
-    if (typeof navigate === 'function') {
-      navigate(page);
-    }
-    if (isMobileNav()) {
-      closeSidebar();
-    }
-  }
-
-  window.addEventListener('resize', () => {
-    if (!isMobileNav()) {
-      closeSidebar();
-    }
-  });
-
   window.addEventListener('load', () => {
     setTimeout(() => {
       document.getElementById('loader').style.display = 'none';
       document.getElementById('sidebar').style.display = '';
       document.getElementById('main').style.display = '';
-      if (window.lucide) lucide.createIcons();
     }, 300);
 
     function actualizarFecha() {
@@ -467,7 +272,6 @@
       const el = document.getElementById('sidebar-date');
       if (el) el.textContent = `${fecha} · ${hora}`;
     }
-
     actualizarFecha();
     setInterval(actualizarFecha, 60000);
   });

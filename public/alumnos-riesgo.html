@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alumnos en riesgo | Notas Escolares</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/table.css">
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <style>
+    * ,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      background: var(--color-bg);
+      color: var(--color-text);
+    }
+
+    .shell {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: var(--space-8);
+    }
+
+    .page-header {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      margin-bottom: var(--space-6);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      text-decoration: none;
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+      margin-bottom: var(--space-4);
+    }
+
+    .back-link:hover {
+      color: var(--color-text);
+    }
+
+    .page-header h1 {
+      font-family: 'Instrument Serif', serif;
+      font-size: var(--text-2xl);
+      font-weight: 500;
+      margin: 0 0 var(--space-1);
+    }
+
+    .page-header p {
+      margin: 0 0 var(--space-5);
+      color: var(--color-text-muted);
+      max-width: 72ch;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+
+    .kpi-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5);
+      box-shadow: var(--shadow-sm);
+      min-width: 0;
+    }
+
+    .kpi-label {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: var(--space-2);
+    }
+
+    .kpi-value {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+
+    .kpi-value.danger { color: var(--color-error); }
+    .kpi-value.warn   { color: var(--color-warning); }
+    .kpi-value.ok     { color: var(--color-success); }
+
+    .table-wrap {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .table-header-bar {
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-weight: 600;
+      font-size: var(--text-sm);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-sm);
+    }
+
+    thead th {
+      background: var(--color-surface-offset);
+      padding: var(--space-3) var(--space-4);
+      text-align: left;
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-muted);
+      border-bottom: 1px solid var(--color-border);
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--color-divider);
+      transition: background 140ms ease;
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: var(--color-surface-offset);
+    }
+
+    td {
+      padding: var(--space-3) var(--space-4);
+      vertical-align: middle;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .student-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      background: var(--color-primary-highlight);
+      color: var(--color-primary);
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-xs);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      background: var(--color-surface-offset);
+      border: 1px solid var(--color-border);
+    }
+
+    .nota-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 38px;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-weight: 700;
+    }
+
+    .nota-7    { background:#dcfce7; color:#166534; }
+    .nota-5-6  { background:#dbeafe; color:#1e40af; }
+    .nota-4-5  { background:#fef9c3; color:#854d0e; }
+    .nota-low  { background:#fee2e2; color:#991b1b; }
+    .badge-gray{ background:var(--color-surface-offset); color:var(--color-text-muted); }
+
+    .motivo-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-weight: 600;
+    }
+
+    .motivo-critico { background: var(--color-error-highlight); color: var(--color-error); }
+    .motivo-prom    { background: var(--color-error-highlight); color: var(--color-error); }
+    .motivo-notas   { background: var(--color-warning-highlight); color: var(--color-warning); }
+
+    .empty-msg {
+      padding: var(--space-12);
+      text-align: center;
+      color: var(--color-text-muted);
+    }
+
+    select.form-select {
+      padding: 8px 12px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border);
+      background: var(--color-surface-2);
+      color: var(--color-text);
+      font-size: var(--text-sm);
+      cursor: pointer;
+      min-height: 44px;
+    }
+
+    @media (max-width: 768px) {
+      .shell {
+        padding: var(--space-4);
+      }
+
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .toolbar .btn,
+      .toolbar .form-select {
+        width: 100%;
+      }
+
+      .kpi-row {
+        grid-template-columns: 1fr;
+      }
+
+      .page-header {
+        padding: var(--space-5);
+      }
+
+      .page-header h1 {
+        font-size: 1.7rem;
+        line-height: 1.1;
+      }
+
+      .table-wrap {
+        overflow: visible;
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+      }
+
+      .table-header-bar {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-xl);
+        margin-bottom: var(--space-4);
+        box-shadow: var(--shadow-sm);
+      }
+
+      table,
+      tbody,
+      tr,
+      td {
+        display: block;
+        width: 100%;
+      }
+
+      thead {
+        border: 0;
+        clip: rect(0 0 0 0);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+      }
+
+      tbody tr {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-xl);
+        margin-bottom: var(--space-4);
+        padding: var(--space-3) var(--space-4);
+        box-shadow: var(--shadow-sm);
+      }
+
+      td {
+        border: 0;
+        padding: .6rem 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: .9rem;
+        text-align: right;
+      }
+
+      td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--color-text-muted);
+        text-align: left;
+        flex: 0 0 42%;
+        max-width: 42%;
+      }
+
+      .student-cell {
+        justify-content: flex-end;
+        text-align: right;
+        max-width: 58%;
+      }
+
+      .student-cell::before {
+        display: none;
+      }
+
+      td[data-label="Alumno"] {
+        display: block;
+        text-align: left;
+        padding-bottom: .85rem;
+        border-bottom: 1px solid var(--color-divider);
+        margin-bottom: .35rem;
+      }
+
+      td[data-label="Alumno"]::before {
+        display: none;
+      }
+
+      td[data-label="Alumno"] .student-cell {
+        justify-content: flex-start;
+        max-width: 100%;
+      }
+
+      .motivo-badge,
+      .chip,
+      .nota-badge {
+        max-width: 100%;
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+<main class="shell">
+
+  <div class="page-header">
+    <a href="/reportes.html" class="back-link">
+      <i data-lucide="arrow-left" size="14"></i> Volver a informes
+    </a>
+    <h1>Alumnos en riesgo</h1>
+    <p>Alumnos con promedio bajo (menor a 4.0) o con pocas evaluaciones registradas (menos de 3 notas).</p>
+    <div class="toolbar">
+      <select class="form-select" id="filter-riesgo-curso" onchange="cargarDatos()">
+        <option value="">Todos los cursos</option>
+      </select>
+      <button class="btn btn-primary" onclick="cargarDatos()">
+        <i data-lucide="refresh-cw" size="14"></i> Actualizar
+      </button>
+    </div>
+  </div>
+
+  <div class="kpi-row" id="kpi-row" style="display:none">
+    <div class="kpi-card">
+      <div class="kpi-label">Total en riesgo</div>
+      <div class="kpi-value danger" id="kpi-total">—</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Promedio bajo</div>
+      <div class="kpi-value danger" id="kpi-prom-bajo">—</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Pocas notas</div>
+      <div class="kpi-value warn" id="kpi-pocas">—</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Ambos factores</div>
+      <div class="kpi-value danger" id="kpi-ambos">—</div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-header-bar">
+      <i data-lucide="alert-triangle" size="15"></i>
+      Listado de alumnos en situación de riesgo
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Alumno</th>
+          <th>Curso</th>
+          <th>Promedio</th>
+          <th>N° notas</th>
+          <th>Tendencia</th>
+          <th>Motivo</th>
+        </tr>
+      </thead>
+      <tbody id="riesgo-body">
+        <tr><td colspan="6" class="empty-msg">Cargando datos…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</main>
+
+<script src="/js/api.js"></script>
+<script>
+  lucide.createIcons();
+
+  const $ = id => document.getElementById(id);
+  const ini = (n='',a='') => ((n[0]||'')+(a[0]||'')).toUpperCase();
+  const fmtN = n => (n != null) ? (+n).toFixed(1) : '–';
+  const color = n => n >= 6.5 ? 'nota-7' : n >= 5 ? 'nota-5-6' : n >= 4 ? 'nota-4-5' : 'nota-low';
+
+  function avgArr(arr) {
+    if (!arr?.length) return null;
+    const v = arr.map(x => parseFloat(x)).filter(x => !isNaN(x) && x >= 1 && x <= 7);
+    return v.length ? v.reduce((a,b)=>a+b,0)/v.length : null;
+  }
+
+  function buildPromMap(notas) {
+    const map = {};
+    notas.forEach(n => {
+      if (!map[n.alumno_id]) map[n.alumno_id] = [];
+      map[n.alumno_id].push(n.valor);
+    });
+    return map;
+  }
+
+  async function poblarCursos() {
+    try {
+      const cursos = await api.getCursos();
+      const sel = $('filter-riesgo-curso');
+      const prev = sel.value;
+      sel.innerHTML = '<option value="">Todos los cursos</option>' +
+        cursos.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
+      sel.value = prev;
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  function filaRiesgo(a) {
+    const tendencia = a.tendencia > 0
+      ? `<span style="color:var(--color-success)">▲ ${a.tendencia}</span>`
+      : a.tendencia < 0
+        ? `<span style="color:var(--color-error)">▼ ${Math.abs(a.tendencia)}</span>`
+        : `<span style="color:var(--color-text-muted)">–</span>`;
+
+    const motivo = a.riesgo_promedio && a.riesgo_pocas_notas
+      ? `<span class="motivo-badge motivo-critico">Promedio bajo + pocas notas</span>`
+      : a.riesgo_promedio
+        ? `<span class="motivo-badge motivo-prom">Promedio bajo</span>`
+        : `<span class="motivo-badge motivo-notas">Pocas notas</span>`;
+
+    return `
+      <tr>
+        <td data-label="Alumno">
+          <div class="student-cell">
+            <div class="avatar">${ini(a.nombres, a.apellidos)}</div>
+            <span>${a.nombres} ${a.apellidos}</span>
+          </div>
+        </td>
+        <td data-label="Curso"><span class="chip">${a.curso_nombre || '–'}</span></td>
+        <td data-label="Promedio">
+          <span class="nota-badge ${a.promedio > 0 ? color(a.promedio) : 'badge-gray'}">
+            ${a.promedio > 0 ? fmtN(a.promedio) : '–'}
+          </span>
+        </td>
+        <td data-label="N° notas">${a.total_notas}</td>
+        <td data-label="Tendencia">${tendencia}</td>
+        <td data-label="Motivo">${motivo}</td>
+      </tr>`;
+  }
+
+  async function cargarDatos() {
+    const tbody = $('riesgo-body');
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-msg">Cargando…</td></tr>`;
+
+    try {
+      const fc = $('filter-riesgo-curso').value;
+      const params = {};
+      if (fc) params.curso_id = fc;
+
+      const [alumnosResp, notasResp] = await Promise.all([
+        api.getAlumnos(params),
+        api.getNotas(),
+      ]);
+
+      const alumnos = Array.isArray(alumnosResp) ? alumnosResp : (alumnosResp?.data ?? []);
+      const notasArr = Array.isArray(notasResp) ? notasResp : (notasResp?.data ?? []);
+      const promMap = buildPromMap(notasArr);
+
+      const UMBRAL_PROM = 4.0;
+      const UMBRAL_NOTAS = 3;
+
+      const enRiesgo = alumnos.map(a => {
+        const vals = promMap[a.id] || [];
+        const promedio = avgArr(vals) ?? 0;
+        const total_notas = vals.length;
+
+        let tendencia = 0;
+        if (vals.length >= 4) {
+          const mid = Math.floor(vals.length / 2);
+          const primera = avgArr(vals.slice(0, mid));
+          const ultima = avgArr(vals.slice(mid));
+          tendencia = parseFloat((ultima - primera).toFixed(1));
+        }
+
+        const riesgo_promedio = total_notas > 0 && promedio < UMBRAL_PROM;
+        const riesgo_pocas_notas = total_notas < UMBRAL_NOTAS;
+
+        return {
+          ...a,
+          promedio,
+          total_notas,
+          tendencia,
+          riesgo_promedio,
+          riesgo_pocas_notas,
+          en_riesgo: riesgo_promedio || riesgo_pocas_notas
+        };
+      })
+      .filter(a => a.en_riesgo)
+      .sort((a, b) => {
+        if (a.riesgo_promedio && !b.riesgo_promedio) return -1;
+        if (!a.riesgo_promedio && b.riesgo_promedio) return 1;
+        return a.promedio - b.promedio;
+      });
+
+      const promBajo = enRiesgo.filter(a => a.riesgo_promedio && !a.riesgo_pocas_notas).length;
+      const pocasN = enRiesgo.filter(a => !a.riesgo_promedio && a.riesgo_pocas_notas).length;
+      const ambos = enRiesgo.filter(a => a.riesgo_promedio && a.riesgo_pocas_notas).length;
+
+      $('kpi-total').textContent = enRiesgo.length;
+      $('kpi-prom-bajo').textContent = promBajo + ambos;
+      $('kpi-pocas').textContent = pocasN + ambos;
+      $('kpi-ambos').textContent = ambos;
+      $('kpi-row').style.display = '';
+
+      tbody.innerHTML = enRiesgo.length
+        ? enRiesgo.map(filaRiesgo).join('')
+        : `<tr><td colspan="6" class="empty-msg">
+             <i data-lucide="award" size="32" style="margin-bottom:8px;color:var(--color-success)"></i><br>
+             ¡Sin alumnos en riesgo! Todos tienen buen rendimiento.
+           </td></tr>`;
+
+    } catch(err) {
+      console.error(err);
+      tbody.innerHTML = `<tr><td colspan="6" class="empty-msg">Error al cargar los datos.</td></tr>`;
+    } finally {
+      lucide.createIcons();
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    await poblarCursos();
+    await cargarDatos();
+  });
+</script>
+</body>
+</html>

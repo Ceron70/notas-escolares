@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profesores activos | Notas Escolares</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/table.css">
+  <link rel="stylesheet" href="/css/forms.css">
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <style>
+    body {
+      background: var(--color-bg);
+      color: var(--color-text);
+    }
+
+    .page-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-8);
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+      padding: var(--space-6);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .page-title h1 {
+      margin: 0 0 var(--space-2);
+      font-size: var(--text-2xl);
+      font-family: var(--font-display, "Instrument Serif", serif);
+      font-weight: 500;
+    }
+
+    .page-title p {
+      margin: 0;
+      color: var(--color-text-muted);
+      max-width: 68ch;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      text-decoration: none;
+      color: var(--color-text);
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 10px 14px;
+      white-space: nowrap;
+    }
+
+    .back-link:hover {
+      background: var(--color-surface-offset);
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-4);
+      margin-bottom: var(--space-5);
+      padding: var(--space-5);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      flex-wrap: wrap;
+    }
+
+    .toolbar-info {
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+    }
+
+    .toolbar button {
+      padding: 10px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      background: var(--color-primary);
+      color: var(--color-text-inverse);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .toolbar button:hover {
+      background: var(--color-primary-hover);
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: var(--space-4);
+      margin-bottom: var(--space-5);
+    }
+
+    .stat-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-card small {
+      display: block;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-2);
+    }
+
+    .stat-card strong {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      color: var(--color-text);
+    }
+
+    .panel {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-5);
+      border-bottom: 1px solid var(--color-border);
+      flex-wrap: wrap;
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: var(--text-lg);
+    }
+
+    .panel-head p {
+      margin: 0;
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      text-align: left;
+      background: var(--color-surface-2);
+      color: var(--color-text);
+      font-size: var(--text-sm);
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--color-border);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--color-border);
+      color: var(--color-text);
+      vertical-align: middle;
+    }
+
+    tbody tr:hover {
+      background: var(--color-surface-2);
+    }
+
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      background: var(--color-primary-highlight);
+      color: var(--color-primary);
+      font-weight: 700;
+    }
+
+    .nota {
+      font-weight: 700;
+    }
+
+    .nota.alta { color: var(--color-success); }
+    .nota.media { color: var(--color-blue); }
+    .nota.baja { color: var(--color-warning); }
+    .nota.critica { color: var(--color-error); }
+
+    .empty-state,
+    .loading-state,
+    .error-state {
+      padding: var(--space-8);
+      text-align: center;
+      color: var(--color-text-muted);
+    }
+
+    @media (max-width: 768px) {
+      .page-shell {
+        padding: var(--space-4);
+      }
+
+      .page-header {
+        flex-direction: column;
+      }
+
+      .back-link {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="page-header">
+      <div class="page-title">
+        <h1>Profesores con más evaluaciones</h1>
+        <p>
+          Este informe muestra qué profesores han registrado más evaluaciones en el sistema, junto con sus alumnos evaluados, asignaturas y promedio asociado.
+        </p>
+      </div>
+      <a class="back-link" href="/reportes.html">
+        <i data-lucide="arrow-left" size="16"></i>
+        Volver a informes
+      </a>
+    </section>
+
+    <section class="toolbar">
+      <div class="toolbar-info">
+        Ranking ordenado por cantidad total de evaluaciones registradas.
+      </div>
+      <button id="btn-recargar" type="button">Actualizar</button>
+    </section>
+
+    <section class="stats-row">
+      <article class="stat-card">
+        <small>Total profesores</small>
+        <strong id="stat-total">0</strong>
+      </article>
+      <article class="stat-card">
+        <small>Total evaluaciones</small>
+        <strong id="stat-evaluaciones">0</strong>
+      </article>
+      <article class="stat-card">
+        <small>Promedio global</small>
+        <strong id="stat-promedio">0.00</strong>
+      </article>
+      <article class="stat-card">
+        <small>Profesor más activo</small>
+        <strong id="stat-top">-</strong>
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Ranking de profesores</h2>
+          <p>Incluye cantidad de evaluaciones, alumnos evaluados, asignaturas y última actividad.</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Profesor</th>
+              <th>Email</th>
+              <th>Evaluaciones</th>
+              <th>Alumnos</th>
+              <th>Asignaturas</th>
+              <th>Promedio</th>
+              <th>Última evaluación</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-profesores">
+            <tr>
+              <td colspan="8" class="loading-state">Cargando datos...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    lucide.createIcons();
+
+    const tbody = document.getElementById("tabla-profesores");
+    const btnRecargar = document.getElementById("btn-recargar");
+
+    const statTotal = document.getElementById("stat-total");
+    const statEvaluaciones = document.getElementById("stat-evaluaciones");
+    const statPromedio = document.getElementById("stat-promedio");
+    const statTop = document.getElementById("stat-top");
+
+    function claseNota(valor) {
+      const n = Number(valor);
+      if (n >= 6.0) return "alta";
+      if (n >= 5.0) return "media";
+      if (n >= 4.0) return "baja";
+      return "critica";
+    }
+
+    function formatNota(valor) {
+      const n = Number(valor);
+      return Number.isFinite(n) ? n.toFixed(2) : "0.00";
+    }
+
+    function formatFecha(valor) {
+      if (!valor) return "-";
+      const fecha = new Date(valor);
+      if (Number.isNaN(fecha.getTime())) return valor;
+      return fecha.toLocaleDateString("es-CL");
+    }
+
+    async function cargarProfesores() {
+      tbody.innerHTML = `<tr><td colspan="8" class="loading-state">Cargando datos...</td></tr>`;
+
+      try {
+        const res = await fetch("/api/reportes/profesores-activos");
+        const json = await res.json();
+
+        if (!res.ok || !json.ok) {
+          throw new Error(json.error || "No se pudo cargar el reporte");
+        }
+
+        const rows = Array.isArray(json.data) ? json.data : [];
+
+        if (!rows.length) {
+          tbody.innerHTML = `<tr><td colspan="8" class="empty-state">No hay datos disponibles.</td></tr>`;
+          statTotal.textContent = "0";
+          statEvaluaciones.textContent = "0";
+          statPromedio.textContent = "0.00";
+          statTop.textContent = "-";
+          return;
+        }
+
+        tbody.innerHTML = rows.map((item, index) => `
+          <tr>
+            <td><span class="rank-badge">${index + 1}</span></td>
+            <td>${item.profesor || ""}</td>
+            <td>${item.email || "-"}</td>
+            <td>${item.total_evaluaciones ?? 0}</td>
+            <td>${item.alumnos_evaluados ?? 0}</td>
+            <td>${item.asignaturas ?? 0}</td>
+            <td><span class="nota ${claseNota(item.promedio_notas)}">${formatNota(item.promedio_notas)}</span></td>
+            <td>${formatFecha(item.ultima_evaluacion)}</td>
+          </tr>
+        `).join("");
+
+        const totalProfes = rows.length;
+        const totalEval = rows.reduce((acc, item) => acc + Number(item.total_evaluaciones || 0), 0);
+        const promedios = rows.map(r => Number(r.promedio_notas)).filter(Number.isFinite);
+        const promedioGlobal = promedios.length
+          ? (promedios.reduce((acc, v) => acc + v, 0) / promedios.length).toFixed(2)
+          : "0.00";
+
+        statTotal.textContent = String(totalProfes);
+        statEvaluaciones.textContent = String(totalEval);
+        statPromedio.textContent = promedioGlobal;
+        statTop.textContent = rows[0]?.profesor || "-";
+      } catch (error) {
+        tbody.innerHTML = `<tr><td colspan="8" class="error-state">${error.message}</td></tr>`;
+        statTotal.textContent = "0";
+        statEvaluaciones.textContent = "0";
+        statPromedio.textContent = "0.00";
+        statTop.textContent = "-";
+      }
+    }
+
+    btnRecargar.addEventListener("click", cargarProfesores);
+    cargarProfesores();
+  </script>
+</body>
+</html>

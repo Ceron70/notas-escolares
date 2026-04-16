@@ -7,7 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap" rel="stylesheet">
-  <!-- ExcelJS para generar .xlsx en el navegador -->
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
   <style>
     :root {
@@ -19,27 +18,17 @@
     }
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
-
     .page{max-width:680px;margin:3rem auto;padding:0 1rem}
-
-    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
-      padding:2rem;box-shadow:0 4px 12px rgba(0,0,0,.06);margin-bottom:1.5rem}
-
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:2rem;box-shadow:0 4px 12px rgba(0,0,0,.06);margin-bottom:1.5rem}
     h1{font-size:1.4rem;font-weight:700;margin-bottom:.25rem}
     .subtitle{color:var(--muted);font-size:.85rem;margin-bottom:1.75rem}
-
     h2{font-size:.95rem;font-weight:600;margin-bottom:1rem;color:var(--text)}
-
     label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:.3rem;margin-top:.75rem}
-    select,input{width:100%;padding:.45rem .75rem;border:1px solid var(--border);
-      border-radius:var(--r);font:inherit;color:var(--text);background:var(--bg)}
+    select,input{width:100%;padding:.45rem .75rem;border:1px solid var(--border);border-radius:var(--r);font:inherit;color:var(--text);background:var(--bg)}
     select:focus,input:focus{outline:2px solid var(--primary);outline-offset:2px}
-
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
     @media(max-width:500px){.grid2{grid-template-columns:1fr}}
-
     .export-options{display:flex;flex-direction:column;gap:.75rem;margin-top:.5rem}
-
     .export-btn{
       display:flex;align-items:center;gap:.85rem;
       padding:.9rem 1.1rem;border-radius:var(--r);
@@ -49,7 +38,6 @@
     }
     .export-btn:hover{border-color:var(--primary);background:#f0f7f7}
     .export-btn.loading{opacity:.6;pointer-events:none}
-
     .btn-icon{
       width:38px;height:38px;border-radius:.4rem;
       display:flex;align-items:center;justify-content:center;
@@ -57,36 +45,25 @@
     }
     .icon-csv {background:#d4dfcc;color:#2e5c10}
     .icon-xlsx{background:#c6d8e4;color:#0b5177}
-
     .btn-info{flex:1}
     .btn-title{font-weight:600;font-size:.88rem;margin-bottom:.15rem}
     .btn-desc{font-size:.75rem;color:var(--muted)}
-
     .btn-arrow{color:var(--faint);font-size:1.1rem;margin-left:auto}
-
-    .back-link{display:inline-flex;align-items:center;gap:.4rem;
-      color:var(--muted);font-size:.82rem;text-decoration:none;margin-top:1rem}
+    .back-link{display:inline-flex;align-items:center;gap:.4rem;color:var(--muted);font-size:.82rem;text-decoration:none;margin-top:1rem}
     .back-link:hover{color:var(--primary)}
-
-    .toast{position:fixed;bottom:1.5rem;right:1.5rem;
-      padding:.6rem 1.1rem;border-radius:var(--r);font-size:.82rem;font-weight:500;
-      background:var(--text);color:#fff;opacity:0;transition:opacity .2s;pointer-events:none;z-index:99}
+    .toast{position:fixed;bottom:1.5rem;right:1.5rem;padding:.6rem 1.1rem;border-radius:var(--r);font-size:.82rem;font-weight:500;background:var(--text);color:#fff;opacity:0;transition:opacity .2s;pointer-events:none;z-index:99}
     .toast.show{opacity:1}
     .toast.err{background:var(--error)}
-
     @keyframes spin{to{transform:rotate(360deg)}}
-    .spinner{display:inline-block;width:16px;height:16px;border:2px solid currentColor;
-      border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+    .spinner{display:inline-block;width:16px;height:16px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
   </style>
 </head>
 <body>
 <div class="page">
-
   <div class="card">
     <h1>📤 Exportar Notas</h1>
-    <p class="subtitle">Descarga las notas en formato CSV (Excel) o XLSX con formato profesional.</p>
+    <p class="subtitle">Descarga las notas en formato CSV o XLSX usando los datos reales del sistema.</p>
 
-    <!-- Filtros -->
     <h2>Filtros opcionales</h2>
     <div class="grid2">
       <div>
@@ -99,37 +76,34 @@
       </div>
     </div>
 
-    <!-- Opciones de exportación -->
     <h2 style="margin-top:1.5rem">Formato de exportación</h2>
     <div class="export-options">
-
-      <button class="export-btn" onclick="exportarCSV('notas')">
+      <button class="export-btn" onclick="exportarCSV('notas', this)">
         <div class="btn-icon icon-csv">📄</div>
         <div class="btn-info">
           <div class="btn-title">Notas individuales — CSV</div>
-          <div class="btn-desc">Todas las evaluaciones con alumno, asignatura, nota, fecha y profesor</div>
+          <div class="btn-desc">Alumno, curso, asignatura, tipo, nota, fecha, profesor y observación</div>
         </div>
         <span class="btn-arrow">›</span>
       </button>
 
-      <button class="export-btn" onclick="exportarCSV('promedios')">
+      <button class="export-btn" onclick="exportarCSV('promedios', this)">
         <div class="btn-icon icon-csv">📊</div>
         <div class="btn-info">
           <div class="btn-title">Promedios por asignatura — CSV</div>
-          <div class="btn-desc">Promedio de cada alumno por asignatura con estado (aprobado/reprobado)</div>
+          <div class="btn-desc">Promedio de cada alumno por asignatura con estado</div>
         </div>
         <span class="btn-arrow">›</span>
       </button>
 
-      <button class="export-btn" onclick="exportarXLSX()">
+      <button class="export-btn" onclick="exportarXLSX(this)">
         <div class="btn-icon icon-xlsx">🗂️</div>
         <div class="btn-info">
           <div class="btn-title">Libro completo — Excel (.xlsx)</div>
-          <div class="btn-desc">Notas + Promedios en hojas separadas con formato, colores y encabezados</div>
+          <div class="btn-desc">Hojas separadas de notas, promedios y resumen</div>
         </div>
         <span class="btn-arrow">›</span>
       </button>
-
     </div>
   </div>
 
@@ -139,189 +113,310 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  let cursosData = [], asigsData = [];
+const BASE = '/api';
+let cursosData = [], asigsData = [], alumnosData = [], profesData = [], notasData = [];
 
-  (async () => {
-    [cursosData, asigsData] = await Promise.all([
-      fetch('/api/cursos').then(r=>r.json()),
-      fetch('/api/asignaturas').then(r=>r.json())
-    ]);
-    document.getElementById('f-curso').innerHTML =
-      '<option value="">Todos los cursos</option>' +
-      cursosData.map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('');
-    document.getElementById('f-asig').innerHTML =
-      '<option value="">Todas las asignaturas</option>' +
-      asigsData.map(a=>`<option value="${a.id}">${a.nombre}</option>`).join('');
-  })();
-
-  function getParams() {
-    const p = new URLSearchParams();
-    const c = document.getElementById('f-curso').value;
-    const a = document.getElementById('f-asig').value;
-    if (c) p.append('curso_id', c);
-    if (a) p.append('asig_id', a);
-    return p.toString() ? '?' + p.toString() : '';
+async function apiFetch(url, options = {}) {
+  const res = await fetch(BASE + url, { headers: { 'Content-Type': 'application/json' }, ...options });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(err.error || 'Error en la solicitud');
   }
+  return res.json().catch(() => null);
+}
 
-  function toast(msg, err=false) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = 'toast show' + (err?' err':'');
-    setTimeout(()=>t.className='toast', 2800);
+function toast(msg, err=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (err ? ' err' : '');
+  setTimeout(() => t.className = 'toast', 2800);
+}
+
+function setLoading(btn, on) {
+  btn.classList.toggle('loading', on);
+  const arrow = btn.querySelector('.btn-arrow');
+  arrow.innerHTML = on ? '<span class="spinner"></span>' : '›';
+}
+
+function escapeCSV(v) {
+  const s = String(v ?? '');
+  return s.includes(',') || s.includes('"') || s.includes('\n') ? '"' + s.replace(/"/g,'""') + '"' : s;
+}
+
+function downloadBlob(blob, filename) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 500);
+}
+
+function formatFecha(f) {
+  const d = new Date(f);
+  return Number.isNaN(d.getTime()) ? (f || '') : d.toLocaleDateString('es-CL');
+}
+
+function formatNota(n) {
+  const num = Number(n);
+  return Number.isFinite(num) ? num.toFixed(1) : '';
+}
+
+function estadoPromedio(p) {
+  const n = Number(p);
+  return !Number.isFinite(n) ? '' : (n >= 4 ? 'Aprobado' : 'Reprobado');
+}
+
+function getFiltros() {
+  return {
+    cursoId: document.getElementById('f-curso').value,
+    asigId: document.getElementById('f-asig').value
+  };
+}
+
+function normalizarNota(nota) {
+  return {
+    alumno: nota.alumno_nombre || '',
+     rut: nota.alumno_rut || '', 
+    curso: nota.curso_nombre || '',
+    asignatura: nota.asig_nombre || '',
+    tipo: nota.tipo || 'Sin tipo',
+    nota: Number(nota.valor || 0),
+    fecha: nota.fecha || '',
+    profesor: nota.prof_nombre || '',
+    observacion: nota.obs || ''
+  };
+}
+
+function notasFiltradas() {
+  const { cursoId, asigId } = getFiltros();
+  return (notasData || [])
+    .map(normalizarNota)
+    .filter(n => {
+      if (cursoId && String(n.cursoId || '') !== String(cursoId)) return false;
+      if (asigId && String(n.asignaturaId || '') !== String(asigId)) return false;
+      return true;
+    })
+    .sort((a, b) => (new Date(b.fecha).getTime() || 0) - (new Date(a.fecha).getTime() || 0));
+}
+
+function construirPromediosExportables(notas) {
+  const agrupado = new Map();
+  notas.forEach(n => {
+    const key = [n.alumno, n.asignatura, n.curso].join('|');
+    if (!agrupado.has(key)) {
+      agrupado.set(key, { alumno: n.alumno, rut: n.rut || '', curso: n.curso, asignatura: n.asignatura, notas: [] });
+    }
+    if (Number.isFinite(n.nota)) agrupado.get(key).notas.push(n.nota);
+  });
+
+  return Array.from(agrupado.values()).map(item => {
+    const cantidad = item.notas.length;
+    const promedio = cantidad ? item.notas.reduce((a, v) => a + v, 0) / cantidad : null;
+    return {
+      alumno: item.alumno,
+      rut: item.rut,
+      curso: item.curso,
+      asignatura: item.asignatura,
+      cantidad,
+      promedio,
+      estado: estadoPromedio(promedio)
+    };
+  }).sort((a, b) =>
+    String(a.curso).localeCompare(String(b.curso), 'es') ||
+    String(a.alumno).localeCompare(String(b.alumno), 'es') ||
+    String(a.asignatura).localeCompare(String(b.asignatura), 'es')
+  );
+  
+  
+  
+  
+}
+
+
+function crearCSV(headers, rows) {
+  return '\uFEFF' + [headers.map(escapeCSV).join(','), ...rows.map(r => r.map(escapeCSV).join(','))].join('\r\n');
+}
+
+async function cargarDatosBase() {
+  const [cursos, asignaturas, alumnos, profesores, notas] = await Promise.all([
+    apiFetch('/cursos'),
+    apiFetch('/asignaturas'),
+    apiFetch('/alumnos'),
+    apiFetch('/profesores'),
+    apiFetch('/notas')
+  ]);
+  cursosData = Array.isArray(cursos) ? cursos : [];
+  asigsData = Array.isArray(asignaturas) ? asignaturas : [];
+  alumnosData = Array.isArray(alumnos) ? alumnos : [];
+  profesData = Array.isArray(profesores) ? profesores : [];
+  notasData = Array.isArray(notas) ? notas : [];
+
+  document.getElementById('f-curso').innerHTML =
+    '<option value="">Todos los cursos</option>' +
+    cursosData.map(c => `<option value="${c.id ?? c._id}">${c.nombre ?? c.descripcion ?? 'Sin nombre'}</option>`).join('');
+
+  document.getElementById('f-asig').innerHTML =
+    '<option value="">Todas las asignaturas</option>' +
+    asigsData.map(a => `<option value="${a.id ?? a._id}">${a.nombre ?? 'Sin nombre'}</option>`).join('');
+}
+
+async function exportarCSV(tipo, btn) {
+  setLoading(btn, true);
+  try {
+    const notas = notasFiltradas();
+    if (tipo === 'notas') {
+      const headers = ['Alumno', 'RUT', 'Curso', 'Asignatura', 'Tipo', 'Nota', 'Fecha', 'Profesor', 'Observación'];
+      const rows = notas.map(n => [n.alumno, n.rut, n.curso, n.asignatura, n.tipo, formatNota(n.nota), formatFecha(n.fecha), n.profesor, n.observacion]);
+      const csv = crearCSV(headers, rows);
+      downloadBlob(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), `notas-${new Date().toISOString().slice(0,10)}.csv`);
+      toast('✓ CSV de notas descargado');
+      return;
+    }
+
+    if (tipo === 'promedios') {
+      const promedios = construirPromediosExportables(notas);
+      const headers = ['Alumno', 'RUT', 'Curso', 'Asignatura', 'Cantidad evaluaciones', 'Promedio', 'Estado'];
+      const rows = promedios.map(p => [p.alumno, p.rut, p.curso, p.asignatura, p.cantidad, p.promedio != null ? p.promedio.toFixed(2) : '', p.estado]);
+      const csv = crearCSV(headers, rows);
+      downloadBlob(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), `promedios-${new Date().toISOString().slice(0,10)}.csv`);
+      toast('✓ CSV de promedios descargado');
+      return;
+    }
+
+    throw new Error('Tipo de exportación no válido');
+  } catch (e) {
+    toast('Error al exportar CSV: ' + e.message, true);
+    console.error(e);
+  } finally {
+    setLoading(btn, false);
   }
+}
 
-  function setLoading(btn, on) {
-    btn.classList.toggle('loading', on);
-    const arrow = btn.querySelector('.btn-arrow');
-    if (on) arrow.innerHTML = '<span class="spinner"></span>';
-    else    arrow.innerHTML = '›';
-  }
+function colorNota(v) {
+  if (v >= 6.5) return 'FF437A22';
+  if (v >= 5.0) return 'FF006494';
+  if (v >= 4.0) return 'FFD19900';
+  return 'FFA12C7B';
+}
 
-  // ── CSV simple: delegar al backend ────────────────────────────────────────
-  function exportarCSV(tipo) {
-    const url = `/api/exportar/${tipo}.csv${getParams()}`;
-    const a = document.createElement('a');
-    a.href = url; a.download = `${tipo}.csv`; a.click();
-    toast(`✓ Descargando ${tipo}.csv`);
-  }
+async function exportarXLSX(btn) {
+  setLoading(btn, true);
+  try {
+    const notas = notasFiltradas();
+    const promedios = construirPromediosExportables(notas);
+    const wb = new ExcelJS.Workbook();
+    wb.creator = 'Notas Escolares';
+    wb.created = new Date();
 
-  // ── Excel con ExcelJS ─────────────────────────────────────────────────────
-  async function exportarXLSX() {
-    const btn = document.querySelector('.export-btn:last-child');
-    setLoading(btn, true);
-    try {
-      const params = getParams();
-      const [notas, promedios] = await Promise.all([
-        fetch(`/api/exportar/notas.csv${params}`).then(r=>r.text()),
-        fetch(`/api/exportar/promedios.csv${params}`).then(r=>r.text())
-      ]);
+    const C_HDR_FILL = { type:'pattern', pattern:'solid', fgColor:{argb:'FF01696F'} };
+    const C_HDR_FONT = { name:'Calibri', size:11, bold:true, color:{argb:'FFFFFFFF'} };
+    const C_BODY_FONT = { name:'Calibri', size:11 };
+    const C_EVEN_FILL = { type:'pattern', pattern:'solid', fgColor:{argb:'FFF0F7F7'} };
 
-      const wb = new ExcelJS.Workbook();
-      wb.creator = 'Notas Escolares';
-      wb.created = new Date();
+    function buildSheet(ws, headers, rows, notaIndex = null) {
+      const widths = [28, 16, 16, 18, 16, 12, 12, 22, 28];
+      headers.forEach((h, i) => ws.getColumn(i + 1).width = widths[i] || 18);
 
-      // ── Colores ──
-      const C_HDR_FILL = { type:'pattern', pattern:'solid', fgColor:{argb:'FF01696F'} };
-      const C_HDR_FONT = { name:'Calibri', size:11, bold:true, color:{argb:'FFFFFFFF'} };
-      const C_BODY_FONT= { name:'Calibri', size:11 };
-      const C_EVEN_FILL= { type:'pattern', pattern:'solid', fgColor:{argb:'FFF0F7F7'} };
-
-      function colorNota(v) {
-        if (v >= 6.5) return 'FF437A22';
-        if (v >= 5.0) return 'FF006494';
-        if (v >= 4.0) return 'FFD19900';
-        return 'FFA12C7B';
-      }
-
-      function parseCSV(text) {
-        const lines = text.replace(/^\uFEFF/,'').split('\r\n').filter(Boolean);
-        return lines.map(l => {
-          const cols = []; let cur='', inQ=false;
-          for (const ch of l) {
-            if (ch==='"') inQ=!inQ;
-            else if (ch===',' && !inQ) { cols.push(cur); cur=''; }
-            else cur+=ch;
-          }
-          cols.push(cur);
-          return cols;
-        });
-      }
-
-      function buildSheet(wb, name, rows, notaCol) {
-        const ws = wb.addWorksheet(name, { views:[{state:'frozen',ySplit:1}] });
-        if (!rows.length) return;
-
-        const headers = rows[0];
-        const colCount = headers.length;
-
-        // Anchos por columna
-        const widths = [30, 16, 18, 18, 12, 8, 12, 22, 30];
-        headers.forEach((h, i) => {
-          ws.getColumn(i+1).width = widths[i] || 15;
-        });
-
-        // Fila encabezado
-        const hdrRow = ws.addRow(headers);
-        hdrRow.eachCell(cell => {
-          cell.fill = C_HDR_FILL;
-          cell.font = C_HDR_FONT;
-          cell.alignment = { vertical:'middle', horizontal:'center' };
-          cell.border = { bottom:{style:'thin',color:{argb:'FF01696F'}} };
-        });
-        hdrRow.height = 22;
-
-        // Filas de datos
-        for (let i=1; i<rows.length; i++) {
-          const r = rows[i];
-          const dataRow = ws.addRow(r);
-          dataRow.height = 18;
-          const isEven = i%2===0;
-          dataRow.eachCell((cell, colN) => {
-            cell.font = C_BODY_FONT;
-            cell.alignment = { vertical:'middle', horizontal: colN===1 ? 'left' : 'center' };
-            if (isEven) cell.fill = C_EVEN_FILL;
-          });
-          // Colorear celda de nota
-          if (notaCol !== null) {
-            const v = parseFloat(r[notaCol]);
-            if (!isNaN(v)) {
-              const noteCell = dataRow.getCell(notaCol+1);
-              noteCell.font = { name:'Calibri', size:11, bold:true, color:{argb:colorNota(v)} };
-            }
-          }
-        }
-
-        // Auto-filtro
-        ws.autoFilter = { from:{row:1,column:1}, to:{row:1,column:colCount} };
-      }
-
-      const notasRows    = parseCSV(notas);
-      const promediosRows= parseCSV(promedios);
-
-      buildSheet(wb, 'Notas',     notasRows,     5);  // col 5 = Nota
-      buildSheet(wb, 'Promedios', promediosRows, 4);  // col 4 = Promedio
-
-      // Hoja resumen
-      const ws3 = wb.addWorksheet('Resumen');
-      ws3.getColumn(1).width = 30;
-      ws3.getColumn(2).width = 15;
-
-      const titulo = ws3.addRow(['Notas Escolares — Resumen de exportación']);
-      titulo.getCell(1).font = { name:'Calibri', size:14, bold:true, color:{argb:'FF01696F'} };
-      titulo.height = 28;
-      ws3.addRow([]);
-      ws3.addRow(['Fecha de exportación', new Date().toLocaleDateString('es-CL')]);
-      ws3.addRow(['Total evaluaciones', notasRows.length > 1 ? notasRows.length-1 : 0]);
-      ws3.addRow(['Total filas promedios', promediosRows.length > 1 ? promediosRows.length-1 : 0]);
-      const filtro = [];
-      const cSel = document.getElementById('f-curso');
-      const aSel = document.getElementById('f-asig');
-      if (cSel.value) filtro.push('Curso: ' + cSel.options[cSel.selectedIndex].text);
-      if (aSel.value) filtro.push('Asignatura: ' + aSel.options[aSel.selectedIndex].text);
-      ws3.addRow(['Filtros aplicados', filtro.length ? filtro.join(', ') : 'Ninguno (todos los datos)']);
-      ws3.getRows(3, 10)?.forEach(r => {
-        r.getCell(1).font = { bold:true, name:'Calibri', size:11 };
-        r.getCell(2).font = { name:'Calibri', size:11 };
-        r.height = 18;
+      const hdrRow = ws.addRow(headers);
+      hdrRow.height = 22;
+      hdrRow.eachCell(cell => {
+        cell.fill = C_HDR_FILL;
+        cell.font = C_HDR_FONT;
+        cell.alignment = { vertical:'middle', horizontal:'center' };
+        cell.border = { bottom:{style:'thin', color:{argb:'FF01696F'}} };
       });
 
-      // Generar y descargar
-      const buffer = await wb.xlsx.writeBuffer();
-      const blob = new Blob([buffer], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement('a');
-      a.href = url;
-      a.download = `notas-escolares-${new Date().toISOString().split('T')[0]}.xlsx`;
-      a.click();
-      URL.revokeObjectURL(url);
-      toast('✓ Archivo Excel descargado');
-    } catch(e) {
-      toast('Error al generar Excel: ' + e.message, true);
-      console.error(e);
-    } finally {
-      setLoading(btn, false);
+      rows.forEach((r, idx) => {
+        const row = ws.addRow(r);
+        row.height = 18;
+        const isEven = idx % 2 === 1;
+        row.eachCell((cell, colN) => {
+          cell.font = C_BODY_FONT;
+          cell.alignment = { vertical:'middle', horizontal: colN === 1 ? 'left' : 'center' };
+          if (isEven) cell.fill = C_EVEN_FILL;
+        });
+
+        if (notaIndex !== null) {
+          const v = Number(r[notaIndex]);
+          if (Number.isFinite(v)) {
+            row.getCell(notaIndex + 1).font = {
+              name:'Calibri',
+              size:11,
+              bold:true,
+              color:{ argb: colorNota(v) }
+            };
+          }
+        }
+      });
+
+      ws.autoFilter = {
+        from: { row:1, column:1 },
+        to: { row:1, column:headers.length }
+      };
+      ws.views = [{ state:'frozen', ySplit:1 }];
     }
+
+    const wsNotas = wb.addWorksheet('Notas');
+    buildSheet(
+      wsNotas,
+      ['Alumno', 'RUT', 'Curso', 'Asignatura', 'Tipo', 'Nota', 'Fecha', 'Profesor', 'Observación'],
+      notas.map(n => [n.alumno, n.rut, n.curso, n.asignatura, n.tipo, n.nota != null ? Number(n.nota) : '', formatFecha(n.fecha), n.profesor, n.observacion]),
+      5
+    );
+
+    const wsProm = wb.addWorksheet('Promedios');
+    buildSheet(
+      wsProm,
+      ['Alumno', 'RUT', 'Curso', 'Asignatura', 'Cantidad evaluaciones', 'Promedio', 'Estado'],
+      promedios.map(p => [p.alumno, p.rut, p.curso, p.asignatura, p.cantidad, p.promedio != null ? Number(p.promedio.toFixed(2)) : '', p.estado]),
+      5
+    );
+
+    const wsRes = wb.addWorksheet('Resumen');
+    wsRes.getColumn(1).width = 30;
+    wsRes.getColumn(2).width = 40;
+
+    const title = wsRes.addRow(['Notas Escolares — Resumen de exportación']);
+    title.getCell(1).font = { name:'Calibri', size:14, bold:true, color:{argb:'FF01696F'} };
+    title.height = 28;
+
+    wsRes.addRow([]);
+    wsRes.addRow(['Fecha de exportación', new Date().toLocaleDateString('es-CL')]);
+    wsRes.addRow(['Total evaluaciones', notas.length]);
+    wsRes.addRow(['Total filas promedios', promedios.length]);
+
+    const filtro = [];
+    const cSel = document.getElementById('f-curso');
+    const aSel = document.getElementById('f-asig');
+    if (cSel.value) filtro.push('Curso: ' + cSel.options[cSel.selectedIndex].text);
+    if (aSel.value) filtro.push('Asignatura: ' + aSel.options[aSel.selectedIndex].text);
+    wsRes.addRow(['Filtros aplicados', filtro.length ? filtro.join(', ') : 'Ninguno']);
+
+    for (let i = 3; i <= 6; i++) {
+      wsRes.getRow(i).getCell(1).font = { name:'Calibri', size:11, bold:true };
+      wsRes.getRow(i).getCell(2).font = { name:'Calibri', size:11 };
+    }
+
+    const buffer = await wb.xlsx.writeBuffer();
+    downloadBlob(
+      new Blob([buffer], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+      `notas-escolares-${new Date().toISOString().slice(0,10)}.xlsx`
+    );
+    toast('✓ Archivo Excel descargado');
+  } catch (e) {
+    toast('Error al generar Excel: ' + e.message, true);
+    console.error(e);
+  } finally {
+    setLoading(btn, false);
   }
+}
+
+cargarDatosBase().catch(err => {
+  toast('Error al cargar datos: ' + err.message, true);
+  console.error(err);
+});
 </script>
 </body>
 </html>

@@ -1,0 +1,111 @@
+const express = require("express");
+const router = express.Router();
+const db = require("../db/database");
+
+router.get("/rendimiento-asignaturas", async (req, res) => {
+  const sql = `
+    SELECT
+      a.id AS asignatura_id,
+      a.nombre AS asignatura,
+      COUNT(n.id) AS cantidad_notas,
+      COALESCE(ROUND(AVG(n.valor)::numeric, 2), 0) AS promedio,
+      COALESCE(MIN(n.valor), 0) AS nota_minima,
+      COALESCE(MAX(n.valor), 0) AS nota_maxima,
+      SUM(CASE WHEN n.valor >= 4.0 THEN 1 ELSE 0 END) AS aprobados,
+      SUM(CASE WHEN n.valor < 4.0 THEN 1 ELSE 0 END) AS reprobados,
+      COALESCE(
+        ROUND(
+          (
+            SUM(CASE WHEN n.valor >= 4.0 THEN 1 ELSE 0 END) * 100.0
+            / NULLIF(COUNT(n.id), 0)
+          )::numeric,
+          2
+        ),
+        0
+      ) AS porcentaje_aprobacion,
+      COALESCE(
+        ROUND(
+          (
+            SUM(CASE WHEN n.valor < 4.0 THEN 1 ELSE 0 END) * 100.0
+            / NULLIF(COUNT(n.id), 0)
+          )::numeric,
+          2
+        ),
+        0
+      ) AS porcentaje_reprobacion
+    FROM public.notas n
+    INNER JOIN public.asignaturas a
+      ON n.asig_id = a.id
+    GROUP BY a.id, a.nombre
+    ORDER BY promedio DESC, a.nombre ASC
+  `;
+
+  try {
+    const conn = await db.getDb();
+    const rows = await db.query(conn, sql, []);
+
+    res.json({
+      ok: true,
+      total: rows.length,
+      data: rows
+    });
+  } catch (error) {
+    console.error("Error al obtener rendimiento por asignatura:", error);
+    res.status(500).json({
+      ok: false,
+      error: "Error al generar el informe de rendimiento por asignatura",
+      detalle: error.message
+    });
+  }
+});
+
+
+router.get("/ranking-cursos", async (req, res) => {
+  const sql = `
+    SELECT
+      c.id AS curso_id,
+      c.nombre AS curso,
+      c.nivel,
+      c.anio,
+      COUNT(DISTINCT al.id) AS total_alumnos,
+      COUNT(n.id) AS total_notas,
+      COALESCE(ROUND(AVG(n.valor)::numeric, 2), 0) AS promedio_general,
+      COALESCE(MIN(n.valor), 0) AS nota_minima,
+      COALESCE(MAX(n.valor), 0) AS nota_maxima,
+      SUM(CASE WHEN n.valor >= 4.0 THEN 1 ELSE 0 END) AS aprobados,
+      SUM(CASE WHEN n.valor < 4.0 THEN 1 ELSE 0 END) AS reprobados,
+      COUNT(DISTINCT CASE WHEN al2.promedio < 4.0 THEN al2.alumno_id END) AS alumnos_criticos
+    FROM public.cursos c
+    LEFT JOIN public.alumnos al
+      ON al.curso_id = c.id AND al.estado = 'Activo'
+    LEFT JOIN public.notas n
+      ON n.alumno_id = al.id
+    LEFT JOIN (
+      SELECT alumno_id, AVG(valor) AS promedio
+      FROM public.notas
+      GROUP BY alumno_id
+    ) al2 ON al2.alumno_id = al.id
+    GROUP BY c.id, c.nombre, c.nivel, c.anio
+    ORDER BY promedio_general DESC, c.nombre ASC
+  `;
+
+  try {
+    const conn = await db.getDb();
+    const rows = await db.query(conn, sql, []);
+
+    res.json({
+      ok: true,
+      total: rows.length,
+      data: rows
+    });
+  } catch (error) {
+    console.error("Error al obtener ranking de cursos:", error);
+    res.status(500).json({
+      ok: false,
+      error: "Error al generar el ranking por curso",
+      detalle: error.message
+    });
+  }
+});
+
+module.exports = router;

@@ -13,16 +13,72 @@
   <link rel="stylesheet" href="/css/components.css">
   <link rel="stylesheet" href="/css/table.css">
   <link rel="stylesheet" href="/css/forms.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
   <style>
     :root {
-      --sidebar-mobile-width: min(84vw, 320px);
+      --sidebar-width: 280px;
+      --topbar-height: 64px;
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-surface-2: #f1f5f9;
+      --color-surface-offset: #f8fafc;
+      --color-border: #e2e8f0;
+      --color-text: #1e293b;
+      --color-text-muted: #64748b;
+      --color-text-faint: #94a3b8;
+      --color-primary: #3b82f6;
+      --color-primary-highlight: rgba(59, 130, 246, 0.1);
+      --color-warning: #f59e0b;
+      --color-success: #10b981;
+      --color-error: #ef4444;
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.25rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --radius-lg: 0.5rem;
+      --radius-xl: 0.75rem;
+      --radius-full: 9999px;
+      --text-xs: 0.75rem;
+      --text-sm: 0.875rem;
+      --text-base: 1rem;
+      --text-lg: 1.125rem;
+      --text-xl: 1.25rem;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    }
+
+    [data-theme="dark"] {
+      --color-bg: #0f172a;
+      --color-surface: #1e293b;
+      --color-surface-2: #334155;
+      --color-surface-offset: #1e293b;
+      --color-border: #334155;
+      --color-text: #f1f5f9;
+      --color-text-muted: #94a3b8;
+      --color-text-faint: #64748b;
+      --color-primary: #60a5fa;
+      --color-primary-highlight: rgba(96, 165, 250, 0.1);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-family: 'Inter', sans-serif;
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    html, body {
-      overflow-x: hidden;
-    }
 
     #loader {
       position: fixed;
@@ -46,230 +102,417 @@
       color: var(--color-primary);
     }
 
-    .sidebar-date {
-      font-size: var(--text-xs);
-      color: var(--color-text-faint);
-      padding: var(--space-2) var(--space-4);
-      margin-bottom: var(--space-1);
-      text-transform: capitalize;
-      letter-spacing: 0.02em;
-    }
-
-    .mobile-overlay {
+    #sidebar {
       position: fixed;
-      inset: 0;
-      background: rgba(17, 24, 39, 0.38);
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transition: opacity .22s ease, visibility .22s ease;
-      z-index: 1190;
+      top: 0;
+      left: 0;
+      width: var(--sidebar-width);
+      height: 100dvh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: var(--color-surface);
+      border-right: 1px solid var(--color-border);
+      z-index: 1200;
+      padding: var(--space-4);
+      transition: transform 220ms ease;
+      transform: translateX(0);
+      display: flex;
+      flex-direction: column;
     }
 
-    .sidebar-close-btn {
+    .sidebar-close {
       display: none;
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-full);
       align-items: center;
       justify-content: center;
-      width: 40px;
-      height: 40px;
+      margin-left: auto;
+    }
+
+    #main {
+      margin-left: var(--sidebar-width);
+      min-height: 100dvh;
+      display: block;
+    }
+
+    #topbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      min-height: var(--topbar-height);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      padding: 0 var(--space-6);
+      background: var(--color-bg);
+      border-bottom: 1px solid var(--color-border);
+      backdrop-filter: blur(10px);
+    }
+
+    .topbar-title {
+      font-size: var(--text-lg);
+      font-weight: 700;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .topbar-date {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      white-space: nowrap;
+    }
+
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-full);
       border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
       background: var(--color-surface);
       color: var(--color-text);
-      margin-left: auto;
-      margin-bottom: var(--space-3);
       cursor: pointer;
+    }
+
+    .icon-btn:hover {
+      background: var(--color-surface-2);
+    }
+
+    .overlay-mobile {
+      display: none;
+    }
+
+    #content {
+      padding: var(--space-6);
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      margin-bottom: var(--space-4);
+    }
+
+    .logo-text {
+      font-weight: 700;
+      font-size: var(--text-base);
+    }
+
+    .sidebar-section {
+      margin-bottom: var(--space-5);
+    }
+
+    .sidebar-label {
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-faint);
+      padding: var(--space-2) var(--space-4);
+      margin-bottom: var(--space-2);
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      min-height: 44px;
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      color: var(--color-text);
+    }
+
+    .nav-item:hover {
+      background: var(--color-surface-offset);
+    }
+
+    .nav-item.active {
+      background: var(--color-primary-highlight);
+      color: var(--color-primary);
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-5);
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--space-4);
+      margin-bottom: var(--space-5);
+    }
+
+    .table-wrap {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-surface);
+    }
+
+    .table-search {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex: 1;
+      min-width: 0;
+    }
+
+    .table-search input,
+    .select-input {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface-2);
+      color: var(--color-text);
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: var(--space-3);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--color-border);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    .data-table th {
+      background: var(--color-surface-2);
+      font-size: var(--text-sm);
+      white-space: nowrap;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      border-radius: var(--radius-lg);
+      border: none;
+      cursor: pointer;
+      font-size: var(--text-sm);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-weight: 500;
+    }
+
+    .btn-primary {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--color-border);
+      color: var(--color-text);
+    }
+
+    .btn-ghost:hover {
+      background: var(--color-surface-2);
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: var(--text-xs);
+    }
+
+    .modal {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      padding: var(--space-4);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-weight: 600;
+      font-size: var(--text-base);
+    }
+
+    .modal-body {
+      padding: var(--space-4);
+    }
+
+    .modal-footer {
+      padding: var(--space-4);
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-3);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+      margin-bottom: var(--space-4);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    .form-label {
+      font-size: var(--text-sm);
+      font-weight: 500;
+    }
+
+    .form-input {
+      padding: 10px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface-2);
+      color: var(--color-text);
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media (max-width: 1024px) {
+      .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .two-col {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (max-width: 768px) {
       #sidebar {
-        position: fixed !important;
-        top: 0;
-        left: 0;
-        height: 100dvh;
-        width: var(--sidebar-mobile-width);
-        max-width: 320px;
-        z-index: 1200;
-        transform: translateX(-104%);
-        transition: transform .24s ease;
+        width: min(86vw, 320px);
+        transform: translateX(-100%);
         box-shadow: var(--shadow-lg);
-        display: block !important;
       }
 
-      body.sidebar-open #sidebar {
+      #sidebar.is-open {
         transform: translateX(0);
       }
 
-      body.sidebar-open .mobile-overlay {
+      .overlay-mobile {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgb(0 0 0 / 0.45);
+        z-index: 1100;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 180ms ease;
+      }
+
+      .overlay-mobile.is-open {
         opacity: 1;
-        visibility: visible;
         pointer-events: auto;
       }
 
-      #main {
-        margin-left: 0 !important;
-        width: 100%;
-      }
-
-      #menu-btn {
-        display: inline-flex !important;
-      }
-
-      .sidebar-close-btn {
+      .sidebar-close {
         display: inline-flex;
       }
 
+      #main {
+        margin-left: 0;
+      }
+
       #topbar {
-        gap: var(--space-2);
-        padding-inline: var(--space-3);
-        flex-wrap: nowrap;
+        padding: 0 var(--space-4);
       }
 
-      #page-title {
-        min-width: 0;
-        flex: 1;
-        font-size: var(--text-base);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      #add-btn {
-        padding: 0.6rem 0.8rem;
-        font-size: var(--text-sm);
-        white-space: nowrap;
-        flex-shrink: 0;
+      .topbar-date {
+        display: none;
       }
 
       #content {
-        padding: var(--space-3);
+        padding: var(--space-4);
       }
 
-      .two-col,
       .kpi-grid {
-        grid-template-columns: 1fr !important;
-        gap: var(--space-3);
+        grid-template-columns: 1fr;
       }
 
       .table-header {
-        display: flex;
         flex-direction: column;
         align-items: stretch;
-        gap: var(--space-3);
-        padding: var(--space-3);
+      }
+
+      .filter-bar {
+        width: 100%;
+        flex-direction: column;
+      }
+
+      .filter-bar .select-input,
+      .filter-bar .btn {
+        width: 100%;
       }
 
       .table-search {
         width: 100%;
-        min-width: 0;
-      }
-
-      .table-search input {
-        width: 100%;
-      }
-
-      .filter-bar {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        gap: var(--space-2);
-        width: 100%;
-      }
-
-      .filter-bar .select-input,
-      .filter-bar .btn,
-      .filter-bar button {
-        width: 100%;
-      }
-
-      #page-alumnos .table-header > .select-input,
-      #page-notas .filter-bar .select-input,
-      #page-riesgo .filter-bar .select-input {
-        width: 100%;
-      }
-
-      .table-wrap {
-        overflow-x: auto;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        position: relative;
       }
 
       .data-table {
-        min-width: 720px;
-      }
-
-      #page-dashboard .data-table {
-        min-width: 640px;
-      }
-
-      #page-riesgo .data-table {
-        min-width: 700px;
-      }
-
-      #page-cursos .data-table,
-      #page-profesores .data-table,
-      #page-asignaturas .data-table {
-        min-width: 680px;
-      }
-
-      .table-wrap::after {
-        content: "← desliza →";
-        position: sticky;
-        left: 100%;
-        bottom: 0;
-        display: inline-block;
-        margin-left: auto;
-        padding: 0.25rem 0.5rem;
-        font-size: 12px;
-        color: var(--color-text-muted);
-        background: color-mix(in srgb, var(--color-surface) 88%, transparent);
-        border-top-left-radius: 8px;
-      }
-
-      .modal {
-        width: min(100% - 1rem, 680px);
-        max-height: 90dvh;
-        overflow: auto;
-        margin: 0.5rem auto;
-      }
-
-      .form-row {
-        display: grid !important;
-        grid-template-columns: 1fr !important;
-        gap: var(--space-3);
-      }
-
-      .modal-footer {
-        display: flex;
-        flex-direction: column-reverse;
-        gap: var(--space-2);
-      }
-
-      .modal-footer .btn {
-        width: 100%;
-      }
-    }
-
-    @media (min-width: 769px) {
-      .mobile-overlay {
-        display: none !important;
-      }
-
-      .sidebar-close-btn {
-        display: none !important;
-      }
-
-      #menu-btn {
-        display: none !important;
-      }
-
-      body {
-        overflow: auto !important;
+        min-width: 780px;
       }
     }
   </style>
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
 
@@ -281,74 +524,60 @@
   <p>Cargando…</p>
 </div>
 
-<div class="mobile-overlay" id="mobile-overlay" onclick="closeSidebar()"></div>
+<div class="overlay-mobile" id="overlay-mobile" onclick="closeSidebar()"></div>
 
-<nav id="sidebar" style="display:none">
-  <button class="sidebar-close-btn" type="button" onclick="closeSidebar()" aria-label="Cerrar menú">
+<nav id="sidebar" aria-label="Navegación principal">
+  <button class="icon-btn sidebar-close" onclick="closeSidebar()" aria-label="Cerrar menú">
     <i data-lucide="x" size="18"></i>
   </button>
 
   <div class="sidebar-logo">
-    <img src="/assets/logo.svg" width="28" height="28" alt="Logo" loading="lazy">
-    <span class="logo-text">Notas Escolares</span>
+    <span class="logo-text">📚 Notas Escolares</span>
   </div>
 
   <div class="sidebar-section">
     <div class="sidebar-label">Principal</div>
-    <div class="nav-item active" data-page="dashboard" onclick="navigateSafe('dashboard')"><i data-lucide="layout-dashboard" size="16"></i> Resumen</div>
-    <div class="nav-item" data-page="notas" onclick="navigateSafe('notas')"><i data-lucide="clipboard-list" size="16"></i> Notas</div>
-    <div class="nav-item" data-page="alumnos" onclick="navigateSafe('alumnos')"><i data-lucide="users" size="16"></i> Alumnos</div>
+    <div class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')"><i data-lucide="layout-dashboard" size="16"></i> Resumen</div>
+    <div class="nav-item" data-page="notas" onclick="navigate('notas')"><i data-lucide="clipboard-list" size="16"></i> Notas</div>
+    <div class="nav-item" data-page="alumnos" onclick="navigate('alumnos')"><i data-lucide="users" size="16"></i> Alumnos</div>
   </div>
 
   <div class="sidebar-section">
     <div class="sidebar-label">Configuración</div>
-    <div class="nav-item" data-page="asignaturas" onclick="navigateSafe('asignaturas')"><i data-lucide="book-open" size="16"></i> Asignaturas</div>
-    <div class="nav-item" data-page="cursos" onclick="navigateSafe('cursos')"><i data-lucide="building-2" size="16"></i> Cursos</div>
-    <div class="nav-item" data-page="profesores" onclick="navigateSafe('profesores')"><i data-lucide="graduation-cap" size="16"></i> Profesores</div>
+    <div class="nav-item" data-page="asignaturas" onclick="navigate('asignaturas')"><i data-lucide="book-open" size="16"></i> Asignaturas</div>
+    <div class="nav-item" data-page="cursos" onclick="navigate('cursos')"><i data-lucide="building-2" size="16"></i> Cursos</div>
+    <div class="nav-item" data-page="profesores" onclick="navigate('profesores')"><i data-lucide="graduation-cap" size="16"></i> Profesores</div>
   </div>
 
   <div class="sidebar-section">
     <div class="sidebar-label">Reportes</div>
-
-    <div class="nav-item" data-page="riesgo" onclick="navigateSafe('riesgo')">
-      <i data-lucide="alert-triangle" size="16"></i> Alumnos en riesgo
-    </div>
-
-    <div class="nav-item" onclick="window.open('/reportes.html','_blank')">
-      <i data-lucide="folder-kanban" size="16"></i> Informes
-    </div>
-
-    <div class="nav-item" onclick="window.open('/boletin.html','_blank')">
-      <i data-lucide="file-text" size="16"></i> Boletín de notas
-    </div>
-
-    <div class="nav-item" onclick="window.open('/exportar.html','_blank')">
-      <i data-lucide="download" size="16"></i> Exportar notas
-    </div>
-  </div>
-
-  <div class="sidebar-footer">
-    <div class="sidebar-date" id="sidebar-date"></div>
-    <div class="nav-item" onclick="toggleTheme()">
-      <i data-lucide="sun" size="16" id="theme-icon"></i>
-      <span id="theme-label">Modo claro</span>
-    </div>
+    <div class="nav-item" data-page="riesgo" onclick="navigate('riesgo')"><i data-lucide="alert-triangle" size="16"></i> Alumnos en riesgo</div>
+    <div class="nav-item" onclick="window.open('/reportes.html','_blank')"><i data-lucide="folder-kanban" size="16"></i> Informes</div>
+    <div class="nav-item" onclick="window.open('/boletin.html','_blank')"><i data-lucide="file-text" size="16"></i> Boletín de notas</div>
+    <div class="nav-item" onclick="window.open('/exportar.html','_blank')"><i data-lucide="download" size="16"></i> Exportar notas</div>
   </div>
 </nav>
 
-<div id="main" style="display:none">
+<div id="main">
   <header id="topbar">
-    <button class="icon-btn" style="display:none" id="menu-btn" onclick="toggleSidebar()" aria-label="Menú">
+    <button class="icon-btn" id="menu-btn" onclick="toggleSidebar()" aria-label="Menú">
       <i data-lucide="menu" size="20"></i>
     </button>
     <div class="topbar-title" id="page-title">Resumen</div>
-    <button class="btn btn-primary" id="add-btn" onclick="openAddModal()">
-      <i data-lucide="plus" size="14"></i> Agregar
-    </button>
+    
+    <div class="topbar-right">
+      <div class="topbar-date" id="topbar-date"></div>
+      <button class="icon-btn" onclick="toggleTheme()" title="Cambiar tema">
+        <i data-lucide="sun" size="18" id="theme-icon"></i>
+      </button>
+      <button class="btn btn-primary" id="add-btn" onclick="openAddModal()">
+        <i data-lucide="plus" size="14"></i> Agregar
+      </button>
+    </div>
   </header>
 
   <main id="content">
-    <!-- DASHBOARD -->
+    <!-- Página Dashboard -->
     <div class="page active" id="page-dashboard">
       <div class="kpi-grid" id="kpi-grid"></div>
       <div class="two-col">
@@ -363,21 +592,35 @@
       </div>
     </div>
 
-    <!-- NOTAS -->
+    <!-- Página Notas -->
     <div class="page" id="page-notas">
       <div class="table-header" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg) var(--radius-lg) 0 0;border-bottom:none">
         <div class="table-search"><i data-lucide="search" size="14" class="search-icon"></i><input type="text" placeholder="Buscar alumno o asignatura…" id="search-notas" oninput="renderNotas()"></div>
         <div class="filter-bar">
           <select class="select-input" id="filter-curso" onchange="renderNotas()"><option value="">Todos los cursos</option></select>
-          <select class="select-input" id="filter-asig"  onchange="renderNotas()"><option value="">Todas las asignaturas</option></select>
+          <select class="select-input" id="filter-asig" onchange="renderNotas()"><option value="">Todas las asignaturas</option></select>
         </div>
       </div>
-      <div class="table-wrap" style="border-radius:0 0 var(--radius-lg) var(--radius-lg)">
-        <table class="data-table"><thead><tr><th>Alumno</th><th>Curso</th><th>Asignatura</th><th>Tipo</th><th>Nota</th><th>Fecha</th><th>Profesor</th><th>Acciones</th></tr></thead><tbody id="notas-body"></tbody></table>
+      
+      <div class="table-wrap alumnos-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Alumno</th>
+              <th>Curso</th>
+              <th>Asignatura</th>
+              <th>Nota</th>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="notas-body"></tbody>
+        </table>
       </div>
     </div>
 
-    <!-- ALUMNOS -->
+    <!-- Página Alumnos -->
     <div class="page" id="page-alumnos">
       <div class="table-header" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg) var(--radius-lg) 0 0;border-bottom:none">
         <div class="table-search"><i data-lucide="search" size="14" class="search-icon"></i><input type="text" placeholder="Buscar alumno…" id="search-alumnos" oninput="renderAlumnos()"></div>
@@ -388,7 +631,7 @@
       </div>
     </div>
 
-    <!-- ASIGNATURAS -->
+    <!-- Página Asignaturas -->
     <div class="page" id="page-asignaturas">
       <div class="table-wrap">
         <div class="table-header"><div class="table-search"><i data-lucide="search" size="14" class="search-icon"></i><input type="text" placeholder="Buscar asignatura…" id="search-asig" oninput="renderAsignaturas()"></div></div>
@@ -396,14 +639,14 @@
       </div>
     </div>
 
-    <!-- CURSOS -->
+    <!-- Página Cursos -->
     <div class="page" id="page-cursos">
       <div class="table-wrap">
         <table class="data-table"><thead><tr><th>Nombre</th><th>Nivel</th><th>Jefe de Curso</th><th>Alumnos</th><th>Año</th><th>Acciones</th></tr></thead><tbody id="cursos-body"></tbody></table>
       </div>
     </div>
 
-    <!-- PROFESORES -->
+    <!-- Página Profesores -->
     <div class="page" id="page-profesores">
       <div class="table-wrap">
         <div class="table-header"><div class="table-search"><i data-lucide="search" size="14" class="search-icon"></i><input type="text" placeholder="Buscar profesor…" id="search-prof" oninput="renderProfesores()"></div></div>
@@ -411,7 +654,7 @@
       </div>
     </div>
 
-    <!-- ALUMNOS EN RIESGO -->
+    <!-- Página Riesgo -->
     <div class="page" id="page-riesgo">
       <div class="table-header" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg) var(--radius-lg) 0 0;border-bottom:none">
         <div style="display:flex;align-items:center;gap:var(--space-2)">
@@ -446,10 +689,10 @@
   </main>
 </div>
 
-<!-- MODALES -->
+<!-- Modales -->
 <div class="overlay" id="modal-nota" style="display:none">
   <div class="modal">
-    <div class="modal-header"><span class="modal-title" id="modal-nota-title">Nota</span><button class="icon-btn" onclick="closeModal('modal-nota')"><i data-lucide="x" size="18"></i></button></div>
+    <div class="modal-header"><span class="modal-title" id="modal-nota-title">Nueva Nota</span><button class="icon-btn" onclick="closeModal('modal-nota')"><i data-lucide="x" size="18"></i></button></div>
     <div class="modal-body">
       <div class="form-row"><div class="form-group"><label class="form-label">Alumno *</label><select class="form-input" id="nota-alumno"></select></div><div class="form-group"><label class="form-label">Asignatura *</label><select class="form-input" id="nota-asig"></select></div></div>
       <div class="form-row"><div class="form-group"><label class="form-label">Nota (1.0–7.0) *</label><input type="number" class="form-input" id="nota-valor" min="1" max="7" step="0.1"></div></div>
@@ -459,6 +702,7 @@
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-nota')">Cancelar</button><button class="btn btn-primary" onclick="saveNota()">Guardar</button></div>
   </div>
 </div>
+
 <div class="overlay" id="modal-alumno" style="display:none">
   <div class="modal">
     <div class="modal-header"><span class="modal-title">Alumno</span><button class="icon-btn" onclick="closeModal('modal-alumno')"><i data-lucide="x" size="18"></i></button></div>
@@ -471,6 +715,7 @@
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-alumno')">Cancelar</button><button class="btn btn-primary" onclick="saveAlumno()">Guardar</button></div>
   </div>
 </div>
+
 <div class="overlay" id="modal-asig" style="display:none">
   <div class="modal">
     <div class="modal-header"><span class="modal-title">Asignatura</span><button class="icon-btn" onclick="closeModal('modal-asig')"><i data-lucide="x" size="18"></i></button></div>
@@ -481,6 +726,7 @@
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-asig')">Cancelar</button><button class="btn btn-primary" onclick="saveAsignatura()">Guardar</button></div>
   </div>
 </div>
+
 <div class="overlay" id="modal-curso" style="display:none">
   <div class="modal">
     <div class="modal-header"><span class="modal-title">Curso</span><button class="icon-btn" onclick="closeModal('modal-curso')"><i data-lucide="x" size="18"></i></button></div>
@@ -491,6 +737,7 @@
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-curso')">Cancelar</button><button class="btn btn-primary" onclick="saveCurso()">Guardar</button></div>
   </div>
 </div>
+
 <div class="overlay" id="modal-prof" style="display:none">
   <div class="modal">
     <div class="modal-header"><span class="modal-title">Profesor</span><button class="icon-btn" onclick="closeModal('modal-prof')"><i data-lucide="x" size="18"></i></button></div>
@@ -503,63 +750,86 @@
   </div>
 </div>
 
-<!-- Scripts en orden correcto -->
 <script src="/js/api.js"></script>
 <script src="/js/app.js"></script>
 <script src="/js/views.js"></script>
 <script src="/js/modals.js"></script>
 <script>
-  function isMobileNav() {
-    return window.innerWidth <= 768;
-  }
+  const mobileMq = window.matchMedia('(max-width: 768px)');
 
   function toggleSidebar(force) {
-    const shouldOpen = typeof force === 'boolean'
-      ? force
-      : !document.body.classList.contains('sidebar-open');
-
-    if (!isMobileNav()) return;
-
-    document.body.classList.toggle('sidebar-open', shouldOpen);
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay-mobile');
+    const open = typeof force === 'boolean' ? force : !sidebar.classList.contains('is-open');
+    sidebar.classList.toggle('is-open', open);
+    overlay.classList.toggle('is-open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
   }
 
   function closeSidebar() {
-    document.body.classList.remove('sidebar-open');
+    toggleSidebar(false);
   }
 
-  function navigateSafe(page) {
-    if (typeof navigate === 'function') {
-      navigate(page);
-    }
-    if (isMobileNav()) {
-      closeSidebar();
+  function toggleTheme() {
+    const html = document.documentElement;
+    const currentTheme = html.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    html.setAttribute('data-theme', newTheme);
+    
+    const icon = document.getElementById('theme-icon');
+    if (icon) {
+      icon.setAttribute('data-lucide', newTheme === 'light' ? 'moon' : 'sun');
+      lucide.createIcons();
     }
   }
 
-  window.addEventListener('resize', () => {
-    if (!isMobileNav()) {
-      closeSidebar();
+  function navigate(page) {
+    if (mobileMq.matches) closeSidebar();
+    
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
+    
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(`page-${page}`)?.classList.add('active');
+    
+    const titles = {
+      dashboard: 'Resumen',
+      notas: 'Notas',
+      alumnos: 'Alumnos',
+      asignaturas: 'Asignaturas',
+      cursos: 'Cursos',
+      profesores: 'Profesores',
+      riesgo: 'Alumnos en riesgo'
+    };
+    document.getElementById('page-title').textContent = titles[page] || page;
+    
+    if (typeof window.renderPage === 'function') {
+      window.renderPage(page);
     }
-  });
+  }
 
   window.addEventListener('load', () => {
     setTimeout(() => {
       document.getElementById('loader').style.display = 'none';
-      document.getElementById('sidebar').style.display = '';
-      document.getElementById('main').style.display = '';
-      if (window.lucide) lucide.createIcons();
     }, 300);
 
     function actualizarFecha() {
       const ahora = new Date();
-      const opciones = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+      const opciones = { weekday:'short', year:'numeric', month:'short', day:'numeric' };
       const fecha = ahora.toLocaleDateString('es-CL', opciones);
-      const hora  = ahora.toLocaleTimeString('es-CL', { hour:'2-digit', minute:'2-digit' });
-      const el = document.getElementById('sidebar-date');
-      if (el) el.textContent = `${fecha} · ${hora}`;
+      const hora = ahora.toLocaleTimeString('es-CL', { hour:'2-digit', minute:'2-digit' });
+      const el = document.getElementById('topbar-date');
+      if (el) el.textContent = `${fecha} ${hora}`;
     }
+    
     actualizarFecha();
     setInterval(actualizarFecha, 60000);
+    
+    lucide.createIcons();
+  });
+
+  mobileMq.addEventListener('change', e => {
+    if (!e.matches) closeSidebar();
   });
 </script>
 </body>

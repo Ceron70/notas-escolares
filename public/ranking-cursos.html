@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ranking por Curso | Notas Escolares</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/table.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <style>
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      overflow-y: auto;
+      overflow-x: auto;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      background: var(--color-bg);
+      color: var(--color-text);
+    }
+
+    * ,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    .report-viewport {
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: visible;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .shell {
+      width: 100%;
+      min-width: 1040px;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: var(--space-8);
+    }
+
+    .page-header {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      margin-bottom: var(--space-6);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      text-decoration: none;
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+      margin-bottom: var(--space-4);
+    }
+
+    .back-link:hover {
+      color: var(--color-text);
+    }
+
+    .page-header h1 {
+      font-family: 'Instrument Serif', serif;
+      font-size: var(--text-2xl);
+      font-weight: 500;
+      margin: 0 0 var(--space-1);
+    }
+
+    .page-header p {
+      margin: 0 0 var(--space-5);
+      color: var(--color-text-muted);
+      max-width: 70ch;
+    }
+
+    .actions {
+      display: flex;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+
+    .kpi-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5);
+      box-shadow: var(--shadow-sm);
+      min-width: 0;
+    }
+
+    .kpi-label {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: var(--space-2);
+    }
+
+    .kpi-value {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      color: var(--color-text);
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+
+    .table-wrap {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      min-width: 100%;
+    }
+
+    .table-header-bar {
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-weight: 600;
+      font-size: var(--text-sm);
+      background: var(--color-surface);
+    }
+
+    .table-scroll {
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: visible;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      min-width: 1200px;
+      border-collapse: collapse;
+      font-size: var(--text-sm);
+    }
+
+    thead th {
+      background: var(--color-surface-offset);
+      padding: var(--space-3) var(--space-4);
+      text-align: left;
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-muted);
+      border-bottom: 1px solid var(--color-border);
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--color-divider);
+      transition: background 140ms ease;
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: var(--color-surface-offset);
+    }
+
+    td {
+      padding: var(--space-3) var(--space-4);
+      vertical-align: middle;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      font-size: var(--text-xs);
+    }
+
+    .rank-1 { background: #fef3c7; color: #92400e; }
+    .rank-2 { background: #f1f5f9; color: #475569; }
+    .rank-3 { background: #fff7ed; color: #9a3412; }
+    .rank-other { background: var(--color-surface-offset); color: var(--color-text-muted); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-weight: 600;
+    }
+
+    .badge-green  { background: var(--color-success-highlight); color: var(--color-success); }
+    .badge-red    { background: var(--color-error-highlight); color: var(--color-error); }
+    .badge-orange { background: var(--color-warning-highlight); color: var(--color-warning); }
+
+    .promedio-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      min-width: 170px;
+    }
+
+    .bar-bg {
+      flex: 1;
+      height: 6px;
+      background: var(--color-surface-dynamic);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      min-width: 60px;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      background: var(--color-primary);
+      transition: width 500ms ease;
+    }
+
+    .bar-fill.warn { background: var(--color-warning); }
+    .bar-fill.danger { background: var(--color-error); }
+
+    .empty-msg {
+      padding: var(--space-12);
+      text-align: center;
+      color: var(--color-text-muted);
+      white-space: normal;
+    }
+
+    @media (max-width: 768px) {
+      .shell {
+        padding: var(--space-4);
+      }
+
+      .kpi-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .page-header {
+        padding: var(--space-5);
+      }
+    }
+
+    @media (max-width: 560px) {
+      .kpi-row {
+        grid-template-columns: 1fr;
+      }
+
+      .page-header h1 {
+        font-size: 1.6rem;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .actions .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="report-viewport">
+    <main class="shell">
+
+      <div class="page-header">
+        <a href="/reportes.html" class="back-link">
+          <i data-lucide="arrow-left" size="14"></i> Volver a informes
+        </a>
+        <h1>Ranking por curso</h1>
+        <p>Compara el rendimiento general entre cursos: promedio, aprobación y alumnos en situación crítica.</p>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="cargarDatos()">
+            <i data-lucide="bar-chart-2" size="14"></i> Cargar datos
+          </button>
+          <button class="btn btn-ghost" onclick="limpiar()">
+            <i data-lucide="x" size="14"></i> Limpiar
+          </button>
+        </div>
+      </div>
+
+      <div class="kpi-row" id="kpi-row" style="display:none">
+        <div class="kpi-card">
+          <div class="kpi-label">Cursos evaluados</div>
+          <div class="kpi-value" id="kpi-cursos">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Mejor promedio</div>
+          <div class="kpi-value" id="kpi-mejor">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Promedio general</div>
+          <div class="kpi-value" id="kpi-general">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Alumnos críticos</div>
+          <div class="kpi-value" id="kpi-criticos">—</div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-header-bar">
+          <i data-lucide="trophy" size="15"></i>
+          Ranking de cursos por rendimiento
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Curso</th>
+                <th>Nivel</th>
+                <th>Alumnos</th>
+                <th>Notas</th>
+                <th>Promedio</th>
+                <th>Mín.</th>
+                <th>Máx.</th>
+                <th>Aprobados</th>
+                <th>Reprobados</th>
+                <th>% Aprob.</th>
+                <th>Críticos</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-body">
+              <tr><td colspan="12" class="empty-msg">Haz clic en "Cargar datos" para ver el ranking.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    async function cargarDatos() {
+      const tbody = document.getElementById("tabla-body");
+      tbody.innerHTML = `<tr><td colspan="12" class="empty-msg">Cargando…</td></tr>`;
+
+      try {
+        const res = await fetch("/api/reportes/ranking-cursos");
+        const json = await res.json();
+
+        if (!json.ok || !json.data.length) {
+          tbody.innerHTML = `<tr><td colspan="12" class="empty-msg">No hay datos disponibles.</td></tr>`;
+          return;
+        }
+
+        const data = json.data;
+        const maxProm = Math.max(...data.map(r => parseFloat(r.promedio_general)));
+
+        const totalCriticos = data.reduce((s, r) => s + parseInt(r.alumnos_criticos || 0), 0);
+        const promGeneral = (data.reduce((s, r) => s + parseFloat(r.promedio_general), 0) / data.length).toFixed(2);
+
+        document.getElementById("kpi-cursos").textContent = data.length;
+        document.getElementById("kpi-mejor").textContent = data[0].promedio_general;
+        document.getElementById("kpi-general").textContent = promGeneral;
+        document.getElementById("kpi-criticos").textContent = totalCriticos;
+        document.getElementById("kpi-row").style.display = "";
+
+        tbody.innerHTML = data.map((r, i) => {
+          const rank = i + 1;
+          const prom = parseFloat(r.promedio_general);
+          const aprobados = parseInt(r.aprobados || 0);
+          const reprobados = parseInt(r.reprobados || 0);
+          const criticos = parseInt(r.alumnos_criticos || 0);
+          const total = aprobados + reprobados;
+          const pct = total > 0 ? (aprobados / total * 100).toFixed(1) : "0.0";
+          const barW = maxProm > 0 ? (prom / maxProm * 100).toFixed(1) : 0;
+          const colorBar = prom >= 5.5 ? "" : prom >= 4.0 ? "warn" : "danger";
+
+          const rankClass = rank === 1 ? "rank-1" : rank === 2 ? "rank-2" : rank === 3 ? "rank-3" : "rank-other";
+
+          const aprobBadge = `<span class="badge badge-green">${aprobados}</span>`;
+          const reprobBadge = reprobados > 0
+            ? `<span class="badge badge-red">${reprobados}</span>`
+            : `<span class="badge badge-green">0</span>`;
+          const criticoBadge = criticos > 0
+            ? `<span class="badge badge-orange">${criticos}</span>`
+            : `<span class="badge badge-green">0</span>`;
+
+          return `
+            <tr>
+              <td><span class="rank-badge ${rankClass}">${rank}</span></td>
+              <td style="font-weight:600">${r.curso}</td>
+              <td>${r.nivel || "—"}</td>
+              <td>${r.total_alumnos}</td>
+              <td>${r.total_notas}</td>
+              <td>
+                <div class="promedio-bar">
+                  <strong>${prom.toFixed(2)}</strong>
+                  <div class="bar-bg">
+                    <div class="bar-fill ${colorBar}" style="width:${barW}%"></div>
+                  </div>
+                </div>
+              </td>
+              <td>${r.nota_minima}</td>
+              <td>${r.nota_maxima}</td>
+              <td>${aprobBadge}</td>
+              <td>${reprobBadge}</td>
+              <td>${pct}%</td>
+              <td>${criticoBadge}</td>
+            </tr>`;
+        }).join("");
+
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="12" class="empty-msg">Error al cargar los datos.</td></tr>`;
+        console.error(err);
+      }
+    }
+
+    function limpiar() {
+      document.getElementById("tabla-body").innerHTML =
+        `<tr><td colspan="12" class="empty-msg">Haz clic en "Cargar datos" para ver el ranking.</td></tr>`;
+      document.getElementById("kpi-row").style.display = "none";
+    }
+  </script>
+</body>
+</html>

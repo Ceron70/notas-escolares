@@ -1,0 +1,77 @@
+<body>
+  <div class="report-viewport">
+    <main class="ranking-page">
+      
+      <section class="stats-grid">
+        <article class="stat-card">
+          <span class="stat-label">Cursos evaluados</span>
+          <strong class="stat-value">5</strong>
+        </article>
+
+        <article class="stat-card">
+          <span class="stat-label">Promedio general</span>
+          <strong class="stat-value">3.27</strong>
+        </article>
+
+        <article class="stat-card">
+          <span class="stat-label">Alumnos críticos</span>
+          <strong class="stat-value">8</strong>
+        </article>
+
+        <article class="stat-card">
+          <span class="stat-label">Aprobación global</span>
+          <strong class="stat-value">42%</strong>
+        </article>
+      </section>
+
+      <section class="panel-card">
+        <div class="panel-head">
+          <h2>🏆 Ranking de cursos por rendimiento</h2>
+        </div>
+
+        <div class="table-wrap">
+          <table class="ranking-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Curso</th>
+                <th>Nivel</th>
+                <th>Alumnos</th>
+                <th>Notas</th>
+                <th>Promedio</th>
+                <th>Mín</th>
+                <th>Máx</th>
+                <th>Aprobación</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>1°A Básico</td>
+                <td>Básico</td>
+                <td>3</td>
+                <td>9</td>
+                <td>5.54</td>
+                <td>3.0</td>
+                <td>6.8</td>
+                <td>88%</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>2°B Básico</td>
+                <td>Básico</td>
+                <td>2</td>
+                <td>3</td>
+                <td>5.43</td>
+                <td>3.8</td>
+                <td>6.2</td>
+                <td>67%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</body>

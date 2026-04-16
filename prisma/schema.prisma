@@ -7,66 +7,67 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Profesor {
-  id           Int       @id @default(autoincrement())
-  nombres      String
-  apellidos    String
-  rut          String?
-  email        String?
-  especialidad String?
-  estado       String    @default("Activo")
-  creado_en    DateTime  @default(now())
-  cursos       Curso[]
-  notas        Nota[]
-}
-
-model Curso {
-  id        Int       @id @default(autoincrement())
-  nombre    String
-  nivel     String    @default("Básico")
-  anio      Int       @default(2025)
-  jefe_id   Int?
-  jefe      Profesor? @relation(fields: [jefe_id], references: [id])
-  creado_en DateTime  @default(now())
-  alumnos   Alumno[]
-}
-
-model Alumno {
+model alumnos {
   id        Int      @id @default(autoincrement())
   nombres   String
   apellidos String
   rut       String?
   nac       String?
   curso_id  Int?
-  curso     Curso?   @relation(fields: [curso_id], references: [id])
   email     String?
   tel       String?
   estado    String   @default("Activo")
-  creado_en DateTime @default(now())
-  notas     Nota[]
+  creado_en DateTime @default(now()) @db.Timestamp(6)
+  cursos    cursos?  @relation(fields: [curso_id], references: [id], onUpdate: NoAction)
+  notas     notas[]
 }
 
-model Asignatura {
+model asignaturas {
   id        Int      @id @default(autoincrement())
   nombre    String
   codigo    String?
   horas     Int      @default(4)
   desc      String?
-  creado_en DateTime @default(now())
-  notas     Nota[]
+  creado_en DateTime @default(now()) @db.Timestamp(6)
+  notas     notas[]
 }
 
-model Nota {
-  id         Int        @id @default(autoincrement())
-  alumno_id  Int
-  alumno     Alumno     @relation(fields: [alumno_id], references: [id], onDelete: Cascade)
-  asig_id    Int
-  asignatura Asignatura @relation(fields: [asig_id], references: [id], onDelete: Cascade)
-  prof_id    Int?
-  profesor   Profesor?  @relation(fields: [prof_id], references: [id])
-  valor      Float
-  tipo       String     @default("Prueba")
-  fecha      DateTime   @default(now())
-  obs        String?
-  creado_en  DateTime   @default(now())
+model cursos {
+  id         Int         @id @default(autoincrement())
+  nombre     String
+  nivel      String      @default("Básico")
+  anio       Int         @default(2025)
+  jefe_id    Int?
+  creado_en  DateTime    @default(now()) @db.Timestamp(6)
+  alumnos    alumnos[]
+  profesores profesores? @relation(fields: [jefe_id], references: [id], onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model notas {
+  id          Int         @id @default(autoincrement())
+  alumno_id   Int
+  asig_id     Int
+  prof_id     Int?
+  valor       Decimal     @db.Decimal
+  tipo        String      @default("Prueba")
+  fecha       DateTime    @default(dbgenerated("CURRENT_DATE")) @db.Date
+  obs         String?
+  creado_en   DateTime    @default(now()) @db.Timestamp(6)
+  alumnos     alumnos     @relation(fields: [alumno_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  asignaturas asignaturas @relation(fields: [asig_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profesores  profesores? @relation(fields: [prof_id], references: [id], onUpdate: NoAction)
+}
+
+model profesores {
+  id           Int      @id @default(autoincrement())
+  nombres      String
+  apellidos    String
+  rut          String?
+  email        String?
+  especialidad String?
+  estado       String   @default("Activo")
+  creado_en    DateTime @default(now()) @db.Timestamp(6)
+  cursos       cursos[]
+  notas        notas[]
 }

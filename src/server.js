@@ -1,5 +1,7 @@
 require('dotenv').config();
 
+
+
 const express = require('express');
 const cors    = require('cors');
 const path    = require('path');
@@ -8,6 +10,12 @@ const { initPg } = require('./db/database');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
+const reportesRoutes = require("./routes/reportes");
+app.use("/api/reportes", reportesRoutes);
+
+
+
+app.use("/api/reportes", reportesRoutes);
 
 app.use(cors());
 app.use(express.json());
